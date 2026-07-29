@@ -2,16 +2,16 @@ import { useState, useEffect, useRef } from "react";
 
 // ─── ASEAN Currencies ─────────────────────────────────────────────────────
 const ASEAN_CURRENCIES = [
-  { code: "MYR", label: "Malaysian Ringgit",  flag: "🇲🇾" },
-  { code: "SGD", label: "Singapore Dollar",   flag: "🇸🇬" },
-  { code: "IDR", label: "Indonesian Rupiah",  flag: "🇮🇩" },
-  { code: "THB", label: "Thai Baht",          flag: "🇹🇭" },
-  { code: "PHP", label: "Philippine Peso",    flag: "🇵🇭" },
-  { code: "VND", label: "Vietnamese Dong",    flag: "🇻🇳" },
-  { code: "MMK", label: "Myanmar Kyat",       flag: "🇲🇲" },
-  { code: "KHR", label: "Cambodian Riel",     flag: "🇰🇭" },
-  { code: "LAK", label: "Lao Kip",            flag: "🇱🇦" },
-  { code: "BND", label: "Brunei Dollar",      flag: "🇧🇳" },
+  { code: "MYR", label: "Malaysian Ringgit", flag: "🇲🇾" },
+  { code: "SGD", label: "Singapore Dollar", flag: "🇸🇬" },
+  { code: "IDR", label: "Indonesian Rupiah", flag: "🇮🇩" },
+  { code: "THB", label: "Thai Baht", flag: "🇹🇭" },
+  { code: "PHP", label: "Philippine Peso", flag: "🇵🇭" },
+  { code: "VND", label: "Vietnamese Dong", flag: "🇻🇳" },
+  { code: "MMK", label: "Myanmar Kyat", flag: "🇲🇲" },
+  { code: "KHR", label: "Cambodian Riel", flag: "🇰🇭" },
+  { code: "LAK", label: "Lao Kip", flag: "🇱🇦" },
+  { code: "BND", label: "Brunei Dollar", flag: "🇧🇳" },
 ];
 
 
@@ -65,11 +65,11 @@ const DEBT_STACK = [
 ];
 
 const NAV_ITEMS = [
-  { id: "home",       label: "Home",       icon: "home" },
-  { id: "budget",     label: "Budget",     icon: "donut_large" },
+  { id: "home", label: "Home", icon: "home" },
+  { id: "budget", label: "Budget", icon: "donut_large" },
   { id: "simulation", label: "Simulation", icon: "play_circle" },
-  { id: "wishlist",   label: "Wishlist",   icon: "auto_awesome" },
-  { id: "profile",    label: "Profile",    icon: "person" },
+  { id: "wishlist", label: "Wishlist", icon: "auto_awesome" },
+  { id: "profile", label: "Profile", icon: "person" },
 ];
 
 // ─── ECG Wave Component ───────────────────────────────────────────────────
@@ -77,7 +77,7 @@ const NAV_ITEMS = [
 
 function EcgCanvas({ color = "#13ecc8" }) {
   const canvasRef = useRef(null);
-  const frameRef  = useRef(null);
+  const frameRef = useRef(null);
   const offsetRef = useRef(0);
 
   // One full ECG "beat" pattern in normalised x∈[0,1], y∈[0,1] (0=top,1=bottom)
@@ -107,18 +107,18 @@ function EcgCanvas({ color = "#13ecc8" }) {
 
   useEffect(() => {
     const canvas = canvasRef.current;
-    const ctx    = canvas.getContext("2d");
-    const W      = canvas.width;
-    const H      = canvas.height;
-    const mid    = H / 2;
-    const SPEED  = 1.2; // px per frame
+    const ctx = canvas.getContext("2d");
+    const W = canvas.width;
+    const H = canvas.height;
+    const mid = H / 2;
+    const SPEED = 1.2; // px per frame
 
     // Erase-head width (blank zone ahead of the drawing point, hospital-monitor style)
     const ERASE_W = 40;
 
     // We keep a circular "line buffer" of y values, length = W
     const yBuf = new Float32Array(W).fill(mid);
-    let   head = 0; // current write position (moves right each frame)
+    let head = 0; // current write position (moves right each frame)
 
     function tick() {
       // Advance head by SPEED pixels
@@ -134,14 +134,14 @@ function EcgCanvas({ color = "#13ecc8" }) {
 
       // Gradient fill under the line
       const grad = ctx.createLinearGradient(0, 0, 0, H);
-      grad.addColorStop(0,   color === "#13ecc8" ? "rgba(19,236,200,0.25)" : "rgba(186,26,26,0.2)");
-      grad.addColorStop(1,   "rgba(0,0,0,0)");
+      grad.addColorStop(0, color === "#13ecc8" ? "rgba(19,236,200,0.25)" : "rgba(186,26,26,0.2)");
+      grad.addColorStop(1, "rgba(0,0,0,0)");
 
       // Draw fill path
       ctx.beginPath();
       ctx.moveTo(0, mid);
       for (let i = 0; i < W; i++) {
-        const x  = i;
+        const x = i;
         const bi = (head - W + 1 + i + W) % W;
         // blank out the erase zone (ERASE_W pixels ahead of head)
         const dist = (W - i); // distance behind head
@@ -156,13 +156,13 @@ function EcgCanvas({ color = "#13ecc8" }) {
       // Draw ECG line
       ctx.beginPath();
       ctx.strokeStyle = color;
-      ctx.lineWidth   = 2.5;
-      ctx.lineJoin    = "round";
-      ctx.lineCap     = "round";
+      ctx.lineWidth = 2.5;
+      ctx.lineJoin = "round";
+      ctx.lineCap = "round";
 
       let started = false;
       for (let i = 0; i < W; i++) {
-        const x  = i;
+        const x = i;
         const bi = (head - W + 1 + i + W) % W;
         const dist = W - i;
         if (dist < ERASE_W) {
@@ -180,10 +180,10 @@ function EcgCanvas({ color = "#13ecc8" }) {
       const dotY = yBuf[(head - ERASE_W + W) % W];
 
       // Outer glow
-      const r = parseInt(color.slice(1,3),16), g = parseInt(color.slice(3,5),16), b = parseInt(color.slice(5,7),16);
+      const r = parseInt(color.slice(1, 3), 16), g = parseInt(color.slice(3, 5), 16), b = parseInt(color.slice(5, 7), 16);
       const radialGrad = ctx.createRadialGradient(dotX, dotY, 0, dotX, dotY, 12);
-      radialGrad.addColorStop(0,   `rgba(${r},${g},${b},0.6)`);
-      radialGrad.addColorStop(1,   `rgba(${r},${g},${b},0)`);
+      radialGrad.addColorStop(0, `rgba(${r},${g},${b},0.6)`);
+      radialGrad.addColorStop(1, `rgba(${r},${g},${b},0)`);
       ctx.beginPath();
       ctx.arc(dotX, dotY, 12, 0, Math.PI * 2);
       ctx.fillStyle = radialGrad;
@@ -198,7 +198,7 @@ function EcgCanvas({ color = "#13ecc8" }) {
       // Horizontal centre line
       ctx.beginPath();
       ctx.strokeStyle = `rgba(${r},${g},${b},0.2)`;
-      ctx.lineWidth   = 1;
+      ctx.lineWidth = 1;
       ctx.setLineDash([4, 4]);
       ctx.moveTo(0, mid);
       ctx.lineTo(W, mid);
@@ -280,9 +280,9 @@ function DebtCard({ item, danger, currency }) {
 // ─── Budget Page Data ─────────────────────────────────────────────────────
 
 const DETECTED_DATES_INIT = [
-  { id: 1, label: "Salary",    schedule: "28th of every month", icon: "attach_money",  iconBg: "#EEF2FF", iconColor: "#4F6EF7" },
-  { id: 2, label: "Rent",      schedule: "1st of every month",  icon: "home",          iconBg: "#FFF3EE", iconColor: "#F97316" },
-  { id: 3, label: "Utilities", schedule: "15th of every month", icon: "water_drop",    iconBg: "#EFF6FF", iconColor: "#3B82F6" },
+  { id: 1, label: "Salary", schedule: "28th of every month", icon: "attach_money", iconBg: "#EEF2FF", iconColor: "#4F6EF7" },
+  { id: 2, label: "Rent", schedule: "1st of every month", icon: "home", iconBg: "#FFF3EE", iconColor: "#F97316" },
+  { id: 3, label: "Utilities", schedule: "15th of every month", icon: "water_drop", iconBg: "#EFF6FF", iconColor: "#3B82F6" },
 ];
 
 // ─── Toggle Switch ────────────────────────────────────────────────────────
@@ -318,13 +318,13 @@ const BILL_OPTIONS = ["Rent", "Utilities", "Car", "Insurance", "Internet", "Phon
 
 const ICON_OPTIONS = [
   { icon: "attach_money", bg: "#EEF2FF", color: "#4F6EF7", label: "Income" },
-  { icon: "home",         bg: "#FFF3EE", color: "#F97316", label: "Housing" },
-  { icon: "water_drop",   bg: "#EFF6FF", color: "#3B82F6", label: "Utility" },
+  { icon: "home", bg: "#FFF3EE", color: "#F97316", label: "Housing" },
+  { icon: "water_drop", bg: "#EFF6FF", color: "#3B82F6", label: "Utility" },
   { icon: "directions_car", bg: "#F0FDF4", color: "#16A34A", label: "Car" },
-  { icon: "shopping_cart",  bg: "#FFF7ED", color: "#EA580C", label: "Shopping" },
-  { icon: "favorite",       bg: "#FFF1F2", color: "#E11D48", label: "Health" },
-  { icon: "school",         bg: "#F5F3FF", color: "#7C3AED", label: "Education" },
-  { icon: "restaurant",     bg: "#FFFBEB", color: "#D97706", label: "Food" },
+  { icon: "shopping_cart", bg: "#FFF7ED", color: "#EA580C", label: "Shopping" },
+  { icon: "favorite", bg: "#FFF1F2", color: "#E11D48", label: "Health" },
+  { icon: "school", bg: "#F5F3FF", color: "#7C3AED", label: "Education" },
+  { icon: "restaurant", bg: "#FFFBEB", color: "#D97706", label: "Food" },
 ];
 
 const FREQ_OPTIONS = [
@@ -338,17 +338,17 @@ const FREQ_OPTIONS = [
 // ── Sub-page: Add Manual Date Form ────────────────────────────────────────
 
 function AddManualDatePage({ onBack, onSave }) {
-  const [label, setLabel]         = useState("");
+  const [label, setLabel] = useState("");
   const [dayOfMonth, setDayOfMonth] = useState(1);
-  const [freq, setFreq]           = useState("Every month");
+  const [freq, setFreq] = useState("Every month");
   const [selectedIcon, setSelectedIcon] = useState(0);
   const [showDayPicker, setShowDayPicker] = useState(false);
   const [showFreqPicker, setShowFreqPicker] = useState(false);
-  const [saving, setSaving]       = useState(false);
+  const [saving, setSaving] = useState(false);
 
   const ordinal = (n) => {
-    const s = ["th","st","nd","rd"]; const v = n % 100;
-    return n + (s[(v-20)%10] || s[v] || s[0]);
+    const s = ["th", "st", "nd", "rd"]; const v = n % 100;
+    return n + (s[(v - 20) % 10] || s[v] || s[0]);
   };
 
   const handleSave = () => {
@@ -575,7 +575,7 @@ function CustomizeCyclePage({ onBack }) {
     setNewBill("");
   };
   const handleSave = () => { setSaved(true); setTimeout(() => { setSaved(false); onBack(); }, 1200); };
-  const ordinal = (n) => { const s = ["th","st","nd","rd"]; const v = n%100; return n+(s[(v-20)%10]||s[v]||s[0]); };
+  const ordinal = (n) => { const s = ["th", "st", "nd", "rd"]; const v = n % 100; return n + (s[(v - 20) % 10] || s[v] || s[0]); };
   const stressStart = ((paycheckDay - 1) / 30) * 100;
   const stressWidth = (10 / 30) * 100;
 
@@ -987,12 +987,12 @@ function BudgetPage({ onBack }) {
 // ─── Simulation Page ──────────────────────────────────────────────────────
 
 const BNPL_PROVIDERS = [
-  { id: "grab",    label: "Grab",    color: "#00B14F", textColor: "#fff" },
-  { id: "shopee",  label: "Shopee",  color: "#EE4D2D", textColor: "#fff" },
-  { id: "atome",   label: "Atome",   color: "#F5C400", textColor: "#111" },
-  { id: "lazada",  label: "Lazada",  color: "#0F146D", textColor: "#fff" },
-  { id: "split",   label: "Split",   color: "#7C3AED", textColor: "#fff" },
-  { id: "klarna",  label: "Klarna",  color: "#FFB3C7", textColor: "#111" },
+  { id: "grab", label: "Grab", color: "#00B14F", textColor: "#fff" },
+  { id: "shopee", label: "Shopee", color: "#EE4D2D", textColor: "#fff" },
+  { id: "atome", label: "Atome", color: "#F5C400", textColor: "#111" },
+  { id: "lazada", label: "Lazada", color: "#0F146D", textColor: "#fff" },
+  { id: "split", label: "Split", color: "#7C3AED", textColor: "#fff" },
+  { id: "klarna", label: "Klarna", color: "#FFB3C7", textColor: "#111" },
 ];
 
 const DURATION_OPTIONS = [3, 6, 9, 12];
@@ -1272,7 +1272,7 @@ function SimResultScreen({ isHighRisk, bufferImpact, totalImpact, monthlyPay, am
 
 // ── Proceed Anyway Screen ─────────────────────────────────────────────────
 function ProceedAnywayScreen({ itemName, amount, duration, onDone }) {
-  const [checked, setChecked]   = useState(false);
+  const [checked, setChecked] = useState(false);
   const [countdown, setCountdown] = useState(null); // null = not started, 7..0
   const [proceeded, setProceeded] = useState(false);
 
@@ -1308,7 +1308,7 @@ function ProceedAnywayScreen({ itemName, amount, duration, onDone }) {
 
         {/* Big headline */}
         <h1 style={{ fontSize: 32, fontWeight: 800, color: "#0F172A", margin: "24px 0 24px", letterSpacing: "-0.025em", lineHeight: 1.15 }}>
-          Choice Confirmed:<br/>Financial Shackles On.
+          Choice Confirmed:<br />Financial Shackles On.
         </h1>
 
         {/* Work timer card */}
@@ -1360,7 +1360,7 @@ function ProceedAnywayScreen({ itemName, amount, duration, onDone }) {
             display: "flex", alignItems: "center", justifyContent: "center",
             transition: "all 0.2s",
           }}>
-            {checked && <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>}
+            {checked && <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>}
           </div>
           <p style={{ fontSize: 14, color: "#334155", margin: 0, lineHeight: 1.55, fontWeight: 500 }}>
             I admit I am being a slave to my impulses and I accept the stress this will cause me later.
@@ -1412,22 +1412,22 @@ function ProceedAnywayScreen({ itemName, amount, duration, onDone }) {
 
 // ── Simulation: Main Form ──────────────────────────────────────────────────
 function SimulationPage({ onBack, onPostpone, onProceed, currency }) {
-  const [itemName, setItemName]   = useState("MacBook Air M2");
-  const [amount, setAmount]       = useState(1200);
+  const [itemName, setItemName] = useState("MacBook Air M2");
+  const [amount, setAmount] = useState(1200);
   const [amountDisplay, setAmountDisplay] = useState("1,200.00");
-  const [provider, setProvider]   = useState("grab");
-  const [duration, setDuration]   = useState(6);
+  const [provider, setProvider] = useState("grab");
+  const [duration, setDuration] = useState(6);
   const [durationRaw, setDurationRaw] = useState("6");
-  const [interest, setInterest]   = useState(0);
+  const [interest, setInterest] = useState(0);
   const [interestRaw, setInterestRaw] = useState("0");
-  const [screen, setScreen]       = useState("form"); // "form" | "loading" | "result" | "proceed"
-  const [progress, setProgress]   = useState(0);
+  const [screen, setScreen] = useState("form"); // "form" | "loading" | "result" | "proceed"
+  const [progress, setProgress] = useState(0);
 
   const SAFETY_BUFFER = 1240.50;
-  const monthlyPay    = (amount / (duration || 1)) * (1 + (interest || 0) / 100);
-  const bufferImpact  = Math.round((monthlyPay / SAFETY_BUFFER) * 100);
-  const totalImpact   = Math.round((amount / SAFETY_BUFFER) * 100);
-  const isHighRisk    = totalImpact >= 50;
+  const monthlyPay = (amount / (duration || 1)) * (1 + (interest || 0) / 100);
+  const bufferImpact = Math.round((monthlyPay / SAFETY_BUFFER) * 100);
+  const totalImpact = Math.round((amount / SAFETY_BUFFER) * 100);
+  const isHighRisk = totalImpact >= 50;
 
   const fmt = (n) => n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
@@ -1446,7 +1446,7 @@ function SimulationPage({ onBack, onPostpone, onProceed, currency }) {
     setProgress(0);
     // Animate progress bar: 0→65% quickly, then slow to 90%, then jump to 100 on done
     const steps = [
-      { target: 30, delay: 0,   dur: 300 },
+      { target: 30, delay: 0, dur: 300 },
       { target: 65, delay: 300, dur: 400 },
       { target: 88, delay: 700, dur: 600 },
     ];
@@ -1460,9 +1460,9 @@ function SimulationPage({ onBack, onPostpone, onProceed, currency }) {
   };
 
   const providers = [
-    { id: "grab",   label: "Grab"   },
+    { id: "grab", label: "Grab" },
     { id: "shopee", label: "Shopee" },
-    { id: "atome",  label: "Atome"  },
+    { id: "atome", label: "Atome" },
     { id: "lazada", label: "Lazada" },
   ];
 
@@ -1731,18 +1731,18 @@ function SimulationPage({ onBack, onPostpone, onProceed, currency }) {
 // ─── Wishlist Page ────────────────────────────────────────────────────────
 
 const WISHLIST_INIT = [
-  { id: 1, name: "MacBook Air M4",     price: 1599, saved: 320,  icon: "laptop_mac",    color: "#6366F1", bg: "#EEF2FF", target: "Dec 2025" },
-  { id: 2, name: "Sony WH-1000XM6",   price: 380,  saved: 190,  icon: "headphones",    color: "#0EA5E9", bg: "#F0F9FF", target: "Sep 2025" },
-  { id: 3, name: "Weekend Getaway",    price: 800,  saved: 50,   icon: "flight_takeoff",color: "#F59E0B", bg: "#FFFBEB", target: "Mar 2026" },
+  { id: 1, name: "MacBook Air M4", price: 1599, saved: 320, icon: "laptop_mac", color: "#6366F1", bg: "#EEF2FF", target: "Dec 2025" },
+  { id: 2, name: "Sony WH-1000XM6", price: 380, saved: 190, icon: "headphones", color: "#0EA5E9", bg: "#F0F9FF", target: "Sep 2025" },
+  { id: 3, name: "Weekend Getaway", price: 800, saved: 50, icon: "flight_takeoff", color: "#F59E0B", bg: "#FFFBEB", target: "Mar 2026" },
 ];
 
 function WishlistPage({ onBack, externalItems, onExternalSetItems, currency }) {
   const [internalItems, setInternalItems] = useState(WISHLIST_INIT);
-  const items    = externalItems    ?? internalItems;
+  const items = externalItems ?? internalItems;
   const setItems = onExternalSetItems ?? setInternalItems;
-  const [showAdd, setShowAdd]     = useState(false);
-  const [newName, setNewName]     = useState("");
-  const [newPrice, setNewPrice]   = useState("");
+  const [showAdd, setShowAdd] = useState(false);
+  const [newName, setNewName] = useState("");
+  const [newPrice, setNewPrice] = useState("");
   const [newTarget, setNewTarget] = useState("");
   const LIQUIDITY = 1240.50;
 
@@ -1765,8 +1765,8 @@ function WishlistPage({ onBack, externalItems, onExternalSetItems, currency }) {
 
   const removeItem = (id) => setItems(prev => prev.filter(it => it.id !== id));
 
-  const totalGoal   = items.reduce((s, it) => s + it.price, 0);
-  const totalSaved  = items.reduce((s, it) => s + it.saved, 0);
+  const totalGoal = items.reduce((s, it) => s + it.price, 0);
+  const totalSaved = items.reduce((s, it) => s + it.saved, 0);
   const liquidityPct = Math.round((totalGoal / LIQUIDITY) * 100);
 
   const fmt = (n) => n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -1921,7 +1921,7 @@ function BottomNav({ active, onSelect }) {
         {NAV_ITEMS.map((item) => {
           const isActive = item.id === active;
           const activeColor = item.id === "budget" ? "#2563EB" : item.id === "simulation" ? "#16A34A" : item.id === "wishlist" ? "#9333EA" : "#0f3c36";
-          const activeBg    = item.id === "budget" ? "rgba(37,99,235,0.12)" : item.id === "simulation" ? "rgba(34,197,94,0.15)" : item.id === "wishlist" ? "rgba(147,51,234,0.12)" : "rgba(19,236,200,0.18)";
+          const activeBg = item.id === "budget" ? "rgba(37,99,235,0.12)" : item.id === "simulation" ? "rgba(34,197,94,0.15)" : item.id === "wishlist" ? "rgba(147,51,234,0.12)" : "rgba(19,236,200,0.18)";
           return (
             <button
               key={item.id}
@@ -1969,15 +1969,15 @@ function ProfilePage({ onBack, danger, currency, onCurrencyChange, userName }) {
   const [alertsOn, setAlertsOn] = useState(true);
 
   // Theme tokens — flips entirely when danger is true
-  const P       = danger ? "#d41111" : "#2bee6c";   // primary colour
-  const Pdark   = danger ? "#7f1d1d" : "#003918";   // dark variant
-  const bgBlob  = danger ? "rgba(212,17,17,0.08)"  : "rgba(43,238,108,0.1)";
+  const P = danger ? "#d41111" : "#2bee6c";   // primary colour
+  const Pdark = danger ? "#7f1d1d" : "#003918";   // dark variant
+  const bgBlob = danger ? "rgba(212,17,17,0.08)" : "rgba(43,238,108,0.1)";
   const cardBorder = danger ? "rgba(212,17,17,0.15)" : "rgba(43,238,108,0.12)";
-  const cardGrad   = danger ? "rgba(212,17,17,0.06)" : "rgba(43,238,108,0.08)";
-  const statusText = danger ? "#d41111"  : "#059669";
-  const statusIcon = danger ? "warning"  : "shield";
+  const cardGrad = danger ? "rgba(212,17,17,0.06)" : "rgba(43,238,108,0.08)";
+  const statusText = danger ? "#d41111" : "#059669";
+  const statusIcon = danger ? "warning" : "shield";
   const statusLabel = danger ? "Guardian Status: Critical" : "Guardian Status: Safe";
-  const badgeBg    = danger ? "rgba(212,17,17,0.1)"  : "rgba(43,238,108,0.1)";
+  const badgeBg = danger ? "rgba(212,17,17,0.1)" : "rgba(43,238,108,0.1)";
 
   const SwitchToggle = ({ checked, onChange }) => (
     <div
@@ -2000,7 +2000,7 @@ function ProfilePage({ onBack, danger, currency, onCurrencyChange, userName }) {
       }}>
         {checked && (
           <svg width="12" height="12" viewBox="0 0 24 24" fill={P}>
-            <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+            <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
           </svg>
         )}
       </div>
@@ -2148,10 +2148,10 @@ function ProfilePage({ onBack, danger, currency, onCurrencyChange, userName }) {
               {/* Mini sparkline */}
               <svg width="80" height="36" viewBox="0 0 100 40" fill="none" style={{ flexShrink: 0 }}>
                 {danger
-                  ? <path d="M0,5 Q20,5 30,10 T50,30 T70,35 T100,38" stroke={P} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
-                  : <path d="M0,35 Q10,35 20,25 T40,20 T60,30 T80,10 T100,5" stroke={P} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+                  ? <path d="M0,5 Q20,5 30,10 T50,30 T70,35 T100,38" stroke={P} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+                  : <path d="M0,35 Q10,35 20,25 T40,20 T60,30 T80,10 T100,5" stroke={P} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
                 }
-                <circle cx="100" cy={danger ? "38" : "5"} r="3.5" fill={P}/>
+                <circle cx="100" cy={danger ? "38" : "5"} r="3.5" fill={P} />
               </svg>
             </div>
             <p style={{ fontSize: 11, color: danger ? "#d41111" : "#94A3B8", margin: "6px 0 0", fontWeight: danger ? 600 : 400, transition: "color 0.8s" }}>
@@ -2221,7 +2221,7 @@ function ProfilePage({ onBack, danger, currency, onCurrencyChange, userName }) {
                     right={
                       <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                         <div style={{ display: "flex" }}>
-                          {["G","S","+1"].map((l,i) => (
+                          {["G", "S", "+1"].map((l, i) => (
                             <div key={i} style={{ width: 24, height: 24, borderRadius: "50%", background: danger ? "#fecaca" : "#E2E8F0", border: "2px solid #fff", marginLeft: i > 0 ? -8 : 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 9, fontWeight: 700, color: danger ? "#d41111" : "#475569" }}>{l}</div>
                           ))}
                         </div>
@@ -2260,7 +2260,7 @@ function ProfilePage({ onBack, danger, currency, onCurrencyChange, userName }) {
               : "Your Guardian Angel has your back since Jan 2024"}
           </p>
           <div style={{ display: "flex", justifyContent: "center", gap: 6 }}>
-            {[0,1,2].map(i => <div key={i} style={{ width: 4, height: 4, borderRadius: "50%", background: danger ? "#fca5a5" : "#CBD5E1", transition: "background 0.8s" }} />)}
+            {[0, 1, 2].map(i => <div key={i} style={{ width: 4, height: 4, borderRadius: "50%", background: danger ? "#fca5a5" : "#CBD5E1", transition: "background 0.8s" }} />)}
           </div>
         </div>
       </div>
@@ -2298,7 +2298,7 @@ function OnboardStep1({ onNext }) {
       {/* Content */}
       <div style={{ flex: 1, display: "flex", flexDirection: "column", padding: "32px 24px 0" }}>
         <h1 style={{ fontSize: 30, fontWeight: 800, color: "#0F172A", margin: "0 0 32px", letterSpacing: "-0.02em", lineHeight: 1.2 }}>
-          What currency do<br/>you spend in?
+          What currency do<br />you spend in?
         </h1>
         <div style={{ position: "relative" }}>
           <label style={{ display: "block", marginBottom: 8, fontSize: 14, fontWeight: 500, color: "#64748B", marginLeft: 4 }}>Default Currency</label>
@@ -2385,7 +2385,7 @@ function OnboardStep2({ onBack, onDone }) {
       {/* Progress */}
       <div style={{ padding: "16px 24px 8px", display: "flex", flexDirection: "column", gap: 8 }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-          <span style={{ fontSize: 14, fontWeight: 700, color: "#136dec" }}>Step 2 of 2</span>
+          <span style={{ fontSize: 14, fontWeight: 700, color: "#136dec" }}>Register Your Name</span>
           <span style={{ fontSize: 14, color: "#64748B" }}>100%</span>
         </div>
         <div style={{ height: 4, width: "100%", background: "rgba(19,109,236,0.1)", borderRadius: 999, overflow: "hidden" }}>
@@ -2400,7 +2400,7 @@ function OnboardStep2({ onBack, onDone }) {
         </div>
         {/* Headline */}
         <h1 style={{ fontSize: 30, fontWeight: 800, color: "#0F172A", margin: 0, textAlign: "center", letterSpacing: "-0.02em", lineHeight: 1.25 }}>
-          What should your<br/>Guardian Angel call you?
+          What should your<br />Guardian Angel call you?
         </h1>
         {/* Input */}
         <div style={{ width: "100%", maxWidth: 360 }}>
@@ -2481,10 +2481,10 @@ export default function Dashboard() {
 
   const handlePostpone = ({ name, price, provider, duration }) => {
     const PROVIDER_META = {
-      Grab:   { icon: "local_shipping", color: "#00B14F", bg: "#00B14F1A" },
-      Shopee: { icon: "shopping_bag",   color: "#EE4D2D", bg: "#EE4D2D1A" },
-      Atome:  { icon: "credit_score",   color: "#EAB308", bg: "#FEF08A33" },
-      Lazada: { icon: "storefront",     color: "#0F146D", bg: "#0F146D1A" },
+      Grab: { icon: "local_shipping", color: "#00B14F", bg: "#00B14F1A" },
+      Shopee: { icon: "shopping_bag", color: "#EE4D2D", bg: "#EE4D2D1A" },
+      Atome: { icon: "credit_score", color: "#EAB308", bg: "#FEF08A33" },
+      Lazada: { icon: "storefront", color: "#0F146D", bg: "#0F146D1A" },
     };
     const meta = PROVIDER_META[provider] || { icon: "star", color: "#9333EA", bg: "#F5F3FF" };
     const newItem = {
@@ -2568,182 +2568,182 @@ export default function Dashboard() {
           <OnboardingFlow onComplete={(cur, name) => { setActiveCurrency(cur); setActiveUserName(name); setOnboarded(true); }} />
         ) : (
           <div style={{ display: "flex", flexDirection: "column", flex: 1, overflow: "hidden" }}>
-        {/* ── Page Content ── */}
-        {activeNav === "budget" ? (
-          <BudgetPage onBack={() => setActiveNav("home")} />
-        ) : activeNav === "simulation" ? (
-          <SimulationPage onBack={() => setActiveNav("home")} onPostpone={handlePostpone} onProceed={handleProceed} currency={activeCurrency} />
-        ) : activeNav === "wishlist" ? (
-          <WishlistPage onBack={() => setActiveNav("home")} externalItems={wishlistItems} onExternalSetItems={setWishlistItems} currency={activeCurrency} />
-        ) : activeNav === "profile" ? (
-          <ProfilePage onBack={() => setActiveNav("home")} danger={dangerMode} currency={activeCurrency} onCurrencyChange={setActiveCurrency} userName={activeUserName} />
-        ) : (
-          <>
-        {/* ── Header ── */}
-        <header
-          style={{
-            background: dangerMode
-              ? "linear-gradient(155deg, #fecaca 0%, #fee2e2 60%, #fff5f5 100%)"
-              : "linear-gradient(155deg, #cdfaf3 0%, #e2f9f5 60%, #edfcf9 100%)",
-            borderRadius: "0 0 2.5rem 2.5rem",
-            paddingTop: 48,
-            paddingBottom: 32,
-            paddingLeft: 24,
-            paddingRight: 24,
-            transition: "background 1s ease",
-          }}
-        >
-          {/* Top bar */}
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-              <div
-                style={{
-                  width: 40, height: 40, borderRadius: "50%",
-                  background: "white",
-                  display: "flex", alignItems: "center", justifyContent: "center",
-                  boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
-                }}
-              >
-                <span
-                  className="material-symbols-outlined"
-                  style={{ fontSize: 22, color: dangerMode ? "#d41111" : "#13ecc8", fontVariationSettings: "'FILL' 1", transition: "color 1s" }}
+            {/* ── Page Content ── */}
+            {activeNav === "budget" ? (
+              <BudgetPage onBack={() => setActiveNav("home")} />
+            ) : activeNav === "simulation" ? (
+              <SimulationPage onBack={() => setActiveNav("home")} onPostpone={handlePostpone} onProceed={handleProceed} currency={activeCurrency} />
+            ) : activeNav === "wishlist" ? (
+              <WishlistPage onBack={() => setActiveNav("home")} externalItems={wishlistItems} onExternalSetItems={setWishlistItems} currency={activeCurrency} />
+            ) : activeNav === "profile" ? (
+              <ProfilePage onBack={() => setActiveNav("home")} danger={dangerMode} currency={activeCurrency} onCurrencyChange={setActiveCurrency} userName={activeUserName} />
+            ) : (
+              <>
+                {/* ── Header ── */}
+                <header
+                  style={{
+                    background: dangerMode
+                      ? "linear-gradient(155deg, #fecaca 0%, #fee2e2 60%, #fff5f5 100%)"
+                      : "linear-gradient(155deg, #cdfaf3 0%, #e2f9f5 60%, #edfcf9 100%)",
+                    borderRadius: "0 0 2.5rem 2.5rem",
+                    paddingTop: 48,
+                    paddingBottom: 32,
+                    paddingLeft: 24,
+                    paddingRight: 24,
+                    transition: "background 1s ease",
+                  }}
                 >
-                  {dangerMode ? "shield_with_heart" : "shield"}
-                </span>
-              </div>
-              <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", color: dangerMode ? "rgba(150,20,20,0.7)" : "rgba(15,60,54,0.6)", transition: "color 1s" }}>
-                {dangerMode ? "Critical State" : "Guardian Mode"}
-              </span>
-            </div>
-            <button
-              className="notif-icon"
-              style={{
-                width: 40, height: 40, borderRadius: "50%",
-                background: dangerMode ? "rgba(212,17,17,0.1)" : "transparent", border: "none", cursor: "pointer",
-                display: "flex", alignItems: "center", justifyContent: "center",
-                position: "relative",
-              }}
-            >
-              <span className="material-symbols-outlined" style={{ fontSize: 22, color: dangerMode ? "#d41111" : "#0f3c36" }}>
-                notifications
-              </span>
-              {dangerMode && (
-                <span style={{
-                  position: "absolute", top: 6, right: 6, width: 8, height: 8,
-                  borderRadius: "50%", background: "#d41111",
-                  boxShadow: "0 0 0 2px #fff",
-                  animation: "safe-pulse 1s ease-in-out infinite",
-                }} />
-              )}
-            </button>
-          </div>
+                  {/* Top bar */}
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                      <div
+                        style={{
+                          width: 40, height: 40, borderRadius: "50%",
+                          background: "white",
+                          display: "flex", alignItems: "center", justifyContent: "center",
+                          boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+                        }}
+                      >
+                        <span
+                          className="material-symbols-outlined"
+                          style={{ fontSize: 22, color: dangerMode ? "#d41111" : "#13ecc8", fontVariationSettings: "'FILL' 1", transition: "color 1s" }}
+                        >
+                          {dangerMode ? "shield_with_heart" : "shield"}
+                        </span>
+                      </div>
+                      <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", color: dangerMode ? "rgba(150,20,20,0.7)" : "rgba(15,60,54,0.6)", transition: "color 1s" }}>
+                        {dangerMode ? "Critical State" : "Guardian Mode"}
+                      </span>
+                    </div>
+                    <button
+                      className="notif-icon"
+                      style={{
+                        width: 40, height: 40, borderRadius: "50%",
+                        background: dangerMode ? "rgba(212,17,17,0.1)" : "transparent", border: "none", cursor: "pointer",
+                        display: "flex", alignItems: "center", justifyContent: "center",
+                        position: "relative",
+                      }}
+                    >
+                      <span className="material-symbols-outlined" style={{ fontSize: 22, color: dangerMode ? "#d41111" : "#0f3c36" }}>
+                        notifications
+                      </span>
+                      {dangerMode && (
+                        <span style={{
+                          position: "absolute", top: 6, right: 6, width: 8, height: 8,
+                          borderRadius: "50%", background: "#d41111",
+                          boxShadow: "0 0 0 2px #fff",
+                          animation: "safe-pulse 1s ease-in-out infinite",
+                        }} />
+                      )}
+                    </button>
+                  </div>
 
-          {/* Balance */}
-          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center" }}>
-            {dangerMode && (
-              <div style={{
-                display: "inline-flex", alignItems: "center", gap: 6,
-                padding: "4px 14px", borderRadius: 999, marginBottom: 10,
-                background: "rgba(212,17,17,0.1)", border: "1px solid rgba(212,17,17,0.2)",
-              }}>
-                <span style={{
-                  width: 8, height: 8, borderRadius: "50%", background: "#d41111",
-                  display: "inline-block", animation: "safe-pulse 1s ease-in-out infinite",
-                }} />
-                <span style={{ fontSize: 11, fontWeight: 800, color: "#d41111", letterSpacing: "0.1em", textTransform: "uppercase" }}>Critical Low</span>
-              </div>
+                  {/* Balance */}
+                  <div style={{ display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center" }}>
+                    {dangerMode && (
+                      <div style={{
+                        display: "inline-flex", alignItems: "center", gap: 6,
+                        padding: "4px 14px", borderRadius: 999, marginBottom: 10,
+                        background: "rgba(212,17,17,0.1)", border: "1px solid rgba(212,17,17,0.2)",
+                      }}>
+                        <span style={{
+                          width: 8, height: 8, borderRadius: "50%", background: "#d41111",
+                          display: "inline-block", animation: "safe-pulse 1s ease-in-out infinite",
+                        }} />
+                        <span style={{ fontSize: 11, fontWeight: 800, color: "#d41111", letterSpacing: "0.1em", textTransform: "uppercase" }}>Critical Low</span>
+                      </div>
+                    )}
+                    <p className="font-google-text" style={{ color: dangerMode ? "rgba(150,20,20,0.6)" : "rgba(15,60,54,0.55)", fontSize: 16, fontWeight: 500, marginBottom: 4, marginTop: 0, letterSpacing: "0.01em", transition: "color 1s" }}>
+                      Your Balance
+                    </p>
+                    <p className="font-google-display" style={{ fontSize: 48, fontWeight: 700, color: dangerMode ? "#7f1d1d" : "#0f3c36", letterSpacing: "-0.02em", lineHeight: 1, margin: 0, marginBottom: 20, transition: "color 1s" }}>
+                      {dangerMode ? `${activeCurrency} 85.00` : `${activeCurrency} 1,240.50`}
+                    </p>
+
+                    {/* ── Animated ECG Canvas ── */}
+                    <div style={{ width: "100%", marginBottom: 16 }}>
+                      <EcgCanvas color={dangerMode ? "#ba1a1a" : "#13ecc8"} />
+                    </div>
+
+                    {/* Status badge */}
+                    <div
+                      style={{
+                        display: "inline-flex", alignItems: "center", gap: 8,
+                        padding: "6px 16px",
+                        background: "rgba(255,255,255,0.65)",
+                        backdropFilter: "blur(8px)",
+                        borderRadius: 999,
+                        border: "1px solid rgba(255,255,255,0.5)",
+                        boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
+                      }}
+                    >
+                      <div className="safe-dot" style={{ width: 8, height: 8, borderRadius: "50%", background: dangerMode ? "#d41111" : "#22c55e", transition: "background 1s" }} />
+                      <span style={{ fontSize: 12, fontWeight: 700, color: dangerMode ? "#d41111" : "#15803d", fontFamily: "'Inter', sans-serif", letterSpacing: "0.01em", transition: "color 1s" }}>
+                        {dangerMode ? "Critical State" : "Safe State"}
+                      </span>
+                    </div>
+                  </div>
+                </header>
+
+                {/* ── Main ── */}
+                <main style={{ flex: 1, padding: "24px 16px 112px", overflowY: "auto" }}>
+
+                  {/* Shadow Debt Stack */}
+                  <section style={{ marginBottom: 24 }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16, padding: "0 4px" }}>
+                      <h2 style={{ fontSize: 20, fontWeight: 800, color: "#111", margin: 0 }}>
+                        {dangerMode ? "Credit Utilization" : "Shadow Debt Stack"}
+                      </h2>
+                      <button style={{ fontSize: 14, fontWeight: 600, color: dangerMode ? "#d41111" : "#13ecc8", background: "none", border: "none", cursor: "pointer" }}>
+                        View All
+                      </button>
+                    </div>
+                    <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                      {DEBT_STACK.map((item) => <DebtCard key={item.id} item={item} danger={dangerMode} currency={activeCurrency} />)}
+                    </div>
+                  </section>
+
+                  {/* Simulate CTA */}
+                  <button
+                    onClick={() => setActiveNav("simulation")}
+                    style={{
+                      width: "100%", display: "flex", alignItems: "center", gap: 16,
+                      padding: "20px 20px",
+                      background: dangerMode
+                        ? "linear-gradient(135deg, #fff1f2 0%, #ffe4e6 100%)"
+                        : "linear-gradient(135deg, #ccfbf4 0%, #d9fdf8 100%)",
+                      border: `1.5px solid ${dangerMode ? "rgba(212,17,17,0.2)" : "rgba(19,236,200,0.25)"}`,
+                      borderRadius: 20, cursor: "pointer",
+                      boxShadow: dangerMode ? "0 2px 12px rgba(212,17,17,0.1)" : "0 2px 12px rgba(19,236,200,0.12)",
+                      transition: "transform 0.15s, box-shadow 0.15s",
+                    }}
+                    onMouseEnter={e => e.currentTarget.style.transform = "scale(1.01)"}
+                    onMouseLeave={e => e.currentTarget.style.transform = "scale(1)"}
+                  >
+                    <div
+                      style={{
+                        width: 56, height: 56, borderRadius: "50%",
+                        background: dangerMode ? "#d41111" : "#13ecc8",
+                        display: "flex", alignItems: "center", justifyContent: "center",
+                        boxShadow: dangerMode ? "0 4px 16px rgba(212,17,17,0.4)" : "0 4px 16px rgba(19,236,200,0.45)",
+                        flexShrink: 0,
+                        transition: "background 1s",
+                      }}
+                    >
+                      <span className="material-symbols-outlined" style={{ fontSize: 30, color: "#fff", fontWeight: 700 }}>add</span>
+                    </div>
+                    <div style={{ textAlign: "left", flex: 1 }}>
+                      <p style={{ fontSize: 16, fontWeight: 700, color: dangerMode ? "#7f1d1d" : "#0f3c36", margin: 0, transition: "color 1s" }}>Simulate a new purchase</p>
+                      <p style={{ fontSize: 13, color: dangerMode ? "rgba(150,20,20,0.55)" : "rgba(15,60,54,0.55)", margin: "2px 0 0", transition: "color 1s" }}>Check impact on your liquidity</p>
+                    </div>
+                    <span className="material-symbols-outlined" style={{ fontSize: 20, color: dangerMode ? "rgba(150,20,20,0.35)" : "rgba(15,60,54,0.35)", transition: "color 1s" }}>arrow_forward</span>
+                  </button>
+                </main>
+              </>
             )}
-            <p className="font-google-text" style={{ color: dangerMode ? "rgba(150,20,20,0.6)" : "rgba(15,60,54,0.55)", fontSize: 16, fontWeight: 500, marginBottom: 4, marginTop: 0, letterSpacing: "0.01em", transition: "color 1s" }}>
-              Your Balance
-            </p>
-            <p className="font-google-display" style={{ fontSize: 48, fontWeight: 700, color: dangerMode ? "#7f1d1d" : "#0f3c36", letterSpacing: "-0.02em", lineHeight: 1, margin: 0, marginBottom: 20, transition: "color 1s" }}>
-              {dangerMode ? `${activeCurrency} 85.00` : `${activeCurrency} 1,240.50`}
-            </p>
 
-            {/* ── Animated ECG Canvas ── */}
-            <div style={{ width: "100%", marginBottom: 16 }}>
-              <EcgCanvas color={dangerMode ? "#ba1a1a" : "#13ecc8"} />
-            </div>
-
-            {/* Status badge */}
-            <div
-              style={{
-                display: "inline-flex", alignItems: "center", gap: 8,
-                padding: "6px 16px",
-                background: "rgba(255,255,255,0.65)",
-                backdropFilter: "blur(8px)",
-                borderRadius: 999,
-                border: "1px solid rgba(255,255,255,0.5)",
-                boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
-              }}
-            >
-              <div className="safe-dot" style={{ width: 8, height: 8, borderRadius: "50%", background: dangerMode ? "#d41111" : "#22c55e", transition: "background 1s" }} />
-              <span style={{ fontSize: 12, fontWeight: 700, color: dangerMode ? "#d41111" : "#15803d", fontFamily: "'Inter', sans-serif", letterSpacing: "0.01em", transition: "color 1s" }}>
-                {dangerMode ? "Critical State" : "Safe State"}
-              </span>
-            </div>
-          </div>
-        </header>
-
-        {/* ── Main ── */}
-        <main style={{ flex: 1, padding: "24px 16px 112px", overflowY: "auto" }}>
-
-          {/* Shadow Debt Stack */}
-          <section style={{ marginBottom: 24 }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16, padding: "0 4px" }}>
-              <h2 style={{ fontSize: 20, fontWeight: 800, color: "#111", margin: 0 }}>
-                {dangerMode ? "Credit Utilization" : "Shadow Debt Stack"}
-              </h2>
-              <button style={{ fontSize: 14, fontWeight: 600, color: dangerMode ? "#d41111" : "#13ecc8", background: "none", border: "none", cursor: "pointer" }}>
-                View All
-              </button>
-            </div>
-            <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-              {DEBT_STACK.map((item) => <DebtCard key={item.id} item={item} danger={dangerMode} currency={activeCurrency} />)}
-            </div>
-          </section>
-
-          {/* Simulate CTA */}
-          <button
-            onClick={() => setActiveNav("simulation")}
-            style={{
-              width: "100%", display: "flex", alignItems: "center", gap: 16,
-              padding: "20px 20px",
-              background: dangerMode
-                ? "linear-gradient(135deg, #fff1f2 0%, #ffe4e6 100%)"
-                : "linear-gradient(135deg, #ccfbf4 0%, #d9fdf8 100%)",
-              border: `1.5px solid ${dangerMode ? "rgba(212,17,17,0.2)" : "rgba(19,236,200,0.25)"}`,
-              borderRadius: 20, cursor: "pointer",
-              boxShadow: dangerMode ? "0 2px 12px rgba(212,17,17,0.1)" : "0 2px 12px rgba(19,236,200,0.12)",
-              transition: "transform 0.15s, box-shadow 0.15s",
-            }}
-            onMouseEnter={e => e.currentTarget.style.transform = "scale(1.01)"}
-            onMouseLeave={e => e.currentTarget.style.transform = "scale(1)"}
-          >
-            <div
-              style={{
-                width: 56, height: 56, borderRadius: "50%",
-                background: dangerMode ? "#d41111" : "#13ecc8",
-                display: "flex", alignItems: "center", justifyContent: "center",
-                boxShadow: dangerMode ? "0 4px 16px rgba(212,17,17,0.4)" : "0 4px 16px rgba(19,236,200,0.45)",
-                flexShrink: 0,
-                transition: "background 1s",
-              }}
-            >
-              <span className="material-symbols-outlined" style={{ fontSize: 30, color: "#fff", fontWeight: 700 }}>add</span>
-            </div>
-            <div style={{ textAlign: "left", flex: 1 }}>
-              <p style={{ fontSize: 16, fontWeight: 700, color: dangerMode ? "#7f1d1d" : "#0f3c36", margin: 0, transition: "color 1s" }}>Simulate a new purchase</p>
-              <p style={{ fontSize: 13, color: dangerMode ? "rgba(150,20,20,0.55)" : "rgba(15,60,54,0.55)", margin: "2px 0 0", transition: "color 1s" }}>Check impact on your liquidity</p>
-            </div>
-            <span className="material-symbols-outlined" style={{ fontSize: 20, color: dangerMode ? "rgba(150,20,20,0.35)" : "rgba(15,60,54,0.35)", transition: "color 1s" }}>arrow_forward</span>
-          </button>
-        </main>
-          </>
-        )}
-
-        {/* ── Bottom Nav ── */}
-        <BottomNav active={activeNav} onSelect={setActiveNav} />
+            {/* ── Bottom Nav ── */}
+            <BottomNav active={activeNav} onSelect={setActiveNav} />
           </div>
         )}
       </div>
