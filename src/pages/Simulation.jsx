@@ -208,7 +208,7 @@ function SimResultScreen({ isHighRisk, bufferImpact, totalImpact, monthlyPay, am
         </div>
       </div>
 
-      {/* CTAs — no longer competing with BottomNav since it's hidden on this screen */}
+      {/* CTAs */}
       <div style={{
         flexShrink: 0, padding: "12px 16px 32px",
         background: isHighRisk ? "rgba(26,18,0,0.95)" : "rgba(246,248,245,0.95)",
@@ -307,7 +307,6 @@ function ProceedAnywayScreen({ itemName, amount, duration, onDone }) {
       {/* Scrollable body */}
       <div style={{ flex: 1, minHeight: 0, overflowY: "auto", padding: "0 16px 24px" }}>
 
-        {/* Big headline */}
         <h1 style={{ fontSize: 32, fontWeight: 800, color: "#0F172A", margin: "24px 0 24px", letterSpacing: "-0.025em", lineHeight: 1.15 }}>
           Choice Confirmed:<br />Financial Shackles On.
         </h1>
@@ -382,7 +381,7 @@ function ProceedAnywayScreen({ itemName, amount, duration, onDone }) {
         )}
       </div>
 
-      {/* CTA — no longer competing with BottomNav since it's hidden on this screen */}
+      {/* CTA */}
       <div style={{
         flexShrink: 0, padding: "12px 16px 32px",
         background: "rgba(248,246,246,0.95)", backdropFilter: "blur(12px)",
@@ -411,7 +410,161 @@ function ProceedAnywayScreen({ itemName, amount, duration, onDone }) {
   );
 }
 
-export default function Simulation({ onBack, onPostpone, onProceed, currency, onScreenChange }) {
+const DAILY_POOL_MINIMUM = 300;
+
+function DailyPoolBlockedScreen({ currency, monthlyIncome, fixedTotal, bnplDue, savingsAmt, dailyPool, onBack }) {
+  const fmt = (n) => n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const deficit = DAILY_POOL_MINIMUM - dailyPool;
+
+  const rows = [
+    { label: "Monthly Income", amount: monthlyIncome, sign: "+", color: "#22c55e" },
+    { label: "Fixed Bills", amount: fixedTotal, sign: "−", color: "#3B82F6" },
+    { label: "BNPL Due", amount: bnplDue, sign: "−", color: "#EF4444" },
+    { label: "Savings Target", amount: savingsAmt, sign: "−", color: "#8B5CF6" },
+  ];
+
+  return (
+    <div style={{
+      display: "flex", flexDirection: "column", flex: 1, minHeight: 0,
+      overflow: "hidden",
+      background: "#0f0a14", fontFamily: "Inter, sans-serif",
+      animation: "fadeSlideUp 0.35s ease both",
+    }}>
+      {/* Header */}
+      <div style={{ display: "flex", alignItems: "center", padding: "52px 16px 16px", justifyContent: "space-between", flexShrink: 0 }}>
+        <button onClick={onBack} style={{ width: 40, height: 40, borderRadius: "50%", border: "none", background: "transparent", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <span className="material-symbols-outlined" style={{ fontSize: 22, color: "#c084fc" }}>arrow_back_ios</span>
+        </button>
+        <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase", color: "rgba(192,132,252,0.7)", flex: 1, textAlign: "center", paddingRight: 40 }}>
+          TRANSACTION BLOCKED
+        </span>
+      </div>
+
+      {/* Scrollable body */}
+      <div style={{ flex: 1, minHeight: 0, overflowY: "auto", padding: "0 16px 24px", display: "flex", flexDirection: "column", alignItems: "center" }}>
+
+        {/* Icon */}
+        <div style={{ marginTop: 16, marginBottom: 20, display: "flex", flexDirection: "column", alignItems: "center", gap: 16 }}>
+          <div style={{
+            width: 80, height: 80, borderRadius: "50%",
+            background: "rgba(192,132,252,0.15)",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            boxShadow: "0 0 40px rgba(192,132,252,0.25)",
+          }}>
+            <span className="material-symbols-outlined" style={{ fontSize: 44, color: "#c084fc", fontVariationSettings: "'FILL' 1" }}>block</span>
+          </div>
+          <h2 style={{ fontSize: 28, fontWeight: 800, color: "#fff", margin: 0, textAlign: "center", letterSpacing: "-0.02em", lineHeight: 1.2 }}>
+            Transaction Failed
+          </h2>
+          <p style={{ fontSize: 15, color: "#94A3B8", margin: 0, textAlign: "center", lineHeight: 1.6, maxWidth: 290 }}>
+            You have triggered the{" "}
+            <strong style={{ color: "#c084fc" }}>minimum monthly pool limit</strong>.
+            Your income after all deductions is too low — proceeding would push you into <strong style={{ color: "#EF4444" }}>overspending</strong>.
+          </p>
+        </div>
+
+        {/* Pool breakdown card */}
+        <div style={{
+          width: "100%",
+          background: "rgba(255,255,255,0.04)",
+          border: "1px solid rgba(192,132,252,0.2)",
+          borderRadius: 28, padding: "20px 20px 16px",
+          marginBottom: 16,
+        }}>
+          <p style={{ fontSize: 12, fontWeight: 700, color: "rgba(192,132,252,0.7)", textTransform: "uppercase", letterSpacing: "0.1em", margin: "0 0 16px" }}>Pool Calculation</p>
+          {rows.map((row) => (
+            <div key={row.label} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                <span style={{ fontSize: 14, fontWeight: 700, color: row.color, width: 16 }}>{row.sign}</span>
+                <span style={{ fontSize: 13, color: "#94A3B8", fontWeight: 500 }}>{row.label}</span>
+              </div>
+              <span className="font-mono" style={{ fontSize: 14, fontWeight: 700, color: "#E2E8F0" }}>{currency} {fmt(row.amount)}</span>
+            </div>
+          ))}
+          <div style={{ height: 1, background: "rgba(192,132,252,0.2)", margin: "12px 0" }} />
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+              <span style={{ fontSize: 14, fontWeight: 700, color: "#EF4444", width: 16 }}>=</span>
+              <span style={{ fontSize: 14, fontWeight: 700, color: "#fff" }}>Monthly Pool</span>
+            </div>
+            <span className="font-mono" style={{ fontSize: 18, fontWeight: 800, color: "#EF4444" }}>{currency} {fmt(dailyPool)}</span>
+          </div>
+        </div>
+
+        {/* Minimum threshold card */}
+        <div style={{
+          width: "100%",
+          background: "rgba(239,68,68,0.08)",
+          border: "1px solid rgba(239,68,68,0.25)",
+          borderRadius: 24, padding: "16px",
+          marginBottom: 16,
+          display: "flex", alignItems: "flex-start", gap: 14,
+        }}>
+          <div style={{
+            width: 48, height: 48, borderRadius: "50%", flexShrink: 0,
+            background: "#EF4444",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            boxShadow: "0 4px 16px rgba(239,68,68,0.35)",
+          }}>
+            <span className="material-symbols-outlined" style={{ fontSize: 26, color: "#fff", fontVariationSettings: "'FILL' 1" }}>shield_with_heart</span>
+          </div>
+          <div style={{ flex: 1 }}>
+            <p style={{ fontSize: 14, fontWeight: 700, color: "#FCA5A5", margin: "0 0 6px" }}>⚠️ Overspending Detected</p>
+            <p style={{ fontSize: 13, color: "#E2E8F0", margin: 0, lineHeight: 1.6 }}>
+              Your remaining monthly pool is only{" "}
+              <strong style={{ color: "#c084fc" }}>{currency} {fmt(dailyPool)}</strong>, which is below the{" "}
+              <strong style={{ color: "#EF4444" }}>{currency} {fmt(DAILY_POOL_MINIMUM)} minimum</strong>.
+              You need <strong style={{ color: "#c084fc" }}>{currency} {fmt(deficit)}</strong> more to unlock new transactions.
+              Reduce your BNPL commitments or fixed bills to free up budget.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* CTA */}
+      <div style={{
+        flexShrink: 0, padding: "12px 16px 32px",
+        background: "rgba(15,10,20,0.95)",
+        backdropFilter: "blur(12px)",
+        borderTop: "1px solid rgba(192,132,252,0.12)",
+      }}>
+        <button onClick={onBack} style={{
+          width: "100%", height: 56, borderRadius: 9999,
+          background: "rgba(192,132,252,0.15)",
+          border: "2px solid rgba(192,132,252,0.4)", cursor: "pointer",
+          color: "#c084fc", fontSize: 16, fontWeight: 700,
+          transition: "all 0.15s",
+        }}
+          onMouseEnter={e => { e.currentTarget.style.background = "rgba(192,132,252,0.25)"; }}
+          onMouseLeave={e => { e.currentTarget.style.background = "rgba(192,132,252,0.15)"; }}
+        >
+          Go Back to Dashboard
+        </button>
+      </div>
+    </div>
+  );
+}
+
+const DEFAULT_PROVIDERS = [
+  { id: "grab", label: "Grab" },
+  { id: "shopee", label: "Shopee Pay / SPayLater" },
+  { id: "atome", label: "Atome" },
+  { id: "lazada", label: "Lazada LazPayLater" },
+];
+
+// Helper icon getter to show e-commerce style icons like Shopee/Lazada/Atome
+function getProviderIcon(label = "") {
+  const name = label.toLowerCase();
+  if (name.includes("shopee") || name.includes("spay")) return "shopping_bag";
+  if (name.includes("atome")) return "bolt";
+  if (name.includes("lazada") || name.includes("lazpay")) return "local_mall";
+  if (name.includes("grab")) return "directions_car";
+  if (name.includes("card") || name.includes("credit") || name.includes("debit")) return "credit_card";
+  if (name.includes("bank") || name.includes("fpx")) return "account_balance";
+  return "payments";
+}
+
+export default function Simulation({ onBack, onPostpone, onProceed, currency, onScreenChange, monthlyIncome = 3200, fixedBills = [], bnplDueThisCycle = 0, savingsTarget = 10, onConfirmPurchase = () => {} }) {
   const [itemName, setItemName] = useState("MacBook Air M2");
   const [amount, setAmount] = useState(1200);
   const [amountDisplay, setAmountDisplay] = useState("1,200.00");
@@ -423,12 +576,73 @@ export default function Simulation({ onBack, onPostpone, onProceed, currency, on
   const [screen, setScreen] = useState("form");
   const [progress, setProgress] = useState(0);
 
-  // Report the current sub-screen up to the parent so it can decide
-  // whether the global BottomNav should be hidden (any screen other
-  // than the initial "form" is a focused, modal-style flow).
+  const [providers, setProviders] = useState(() => {
+    try {
+      const saved = localStorage.getItem("nudge_providers");
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+    } catch (e) { }
+    return DEFAULT_PROVIDERS;
+  });
+  const [isEditingProviders, setIsEditingProviders] = useState(false);
+  const [isAddingProvider, setIsAddingProvider] = useState(false);
+  const [newProviderName, setNewProviderName] = useState("");
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editingId, setEditingId] = useState(null);
+  const [editingLabel, setEditingLabel] = useState("");
+
+  const handleDeleteProvider = (idToDelete) => {
+    const updated = providers.filter(p => p.id !== idToDelete);
+    setProviders(updated);
+    try {
+      localStorage.setItem("nudge_providers", JSON.stringify(updated));
+    } catch (e) { }
+    if (provider === idToDelete) {
+      if (updated.length > 0) {
+        setProvider(updated[0].id);
+      } else {
+        setProvider("");
+      }
+    }
+  };
+
+  const handleAddProvider = () => {
+    const trimmed = newProviderName.trim();
+    if (!trimmed) return;
+    const newId = trimmed.toLowerCase().replace(/\s+/g, "_") + "_" + Date.now();
+    const newProviderObj = { id: newId, label: trimmed };
+    const updated = [...providers, newProviderObj];
+    setProviders(updated);
+    try {
+      localStorage.setItem("nudge_providers", JSON.stringify(updated));
+    } catch (e) { }
+    setProvider(newId); // Automatically select newly added payment method
+    setNewProviderName("");
+    setIsAddingProvider(false);
+  };
+
+  const handleRenameProvider = (idToRename, newLabel) => {
+    const trimmed = newLabel.trim();
+    if (!trimmed) return;
+    const updated = providers.map(p => p.id === idToRename ? { ...p, label: trimmed } : p);
+    setProviders(updated);
+    try {
+      localStorage.setItem("nudge_providers", JSON.stringify(updated));
+    } catch (e) { }
+  };
+
+  const handleResetProviders = () => {
+    setProviders(DEFAULT_PROVIDERS);
+    setProvider("grab");
+    try {
+      localStorage.setItem("nudge_providers", JSON.stringify(DEFAULT_PROVIDERS));
+    } catch (e) { }
+  };
+
   useEffect(() => {
     if (onScreenChange) onScreenChange(screen);
-    // Reset to "form" (i.e. re-show the nav) if this component unmounts
     return () => { if (onScreenChange) onScreenChange("form"); };
   }, [screen, onScreenChange]);
 
@@ -437,6 +651,12 @@ export default function Simulation({ onBack, onPostpone, onProceed, currency, on
   const bufferImpact = Math.round((monthlyPay / SAFETY_BUFFER) * 100);
   const totalImpact = Math.round((amount / SAFETY_BUFFER) * 100);
   const isHighRisk = totalImpact >= 50;
+
+  // ── Daily Pool Exception Logic ────────────────────────────────────────────
+  const fixedTotal = fixedBills.reduce((s, b) => s + b.amount, 0);
+  const savingsAmt = (monthlyIncome * savingsTarget) / 100;
+  const dailyPool = monthlyIncome - fixedTotal - bnplDueThisCycle - savingsAmt;
+  const isDailyPoolBlocked = dailyPool < DAILY_POOL_MINIMUM;
 
   const fmt = (n) => n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
@@ -451,6 +671,11 @@ export default function Simulation({ onBack, onPostpone, onProceed, currency, on
 
   const handleAnalyze = () => {
     if (!itemName.trim()) return;
+    // Block if daily pool is below minimum requirement
+    if (isDailyPoolBlocked) {
+      setScreen("pool_blocked");
+      return;
+    }
     setScreen("loading");
     setProgress(0);
     const steps = [
@@ -467,20 +692,15 @@ export default function Simulation({ onBack, onPostpone, onProceed, currency, on
     }, 1600);
   };
 
-  const providers = [
-    { id: "grab", label: "Grab" },
-    { id: "shopee", label: "Shopee" },
-    { id: "atome", label: "Atome" },
-    { id: "lazada", label: "Lazada" },
-  ];
-
-  const providerLabel = providers.find(p => p.id === provider)?.label ?? provider;
+  const providerLabel = providers.find(p => p.id === provider)?.label ?? provider ?? "None";
 
   if (screen === "loading") {
     return <SimLoadingScreen progress={progress} />;
   }
 
   if (screen === "result") {
+    // Build transaction object to pass to confirm handlers
+    const txDetails = { name: itemName, amount, monthlyPay, provider: providerLabel, duration };
     return (
       <SimResultScreen
         isHighRisk={isHighRisk}
@@ -492,7 +712,10 @@ export default function Simulation({ onBack, onPostpone, onProceed, currency, on
         itemName={itemName}
         providerLabel={providerLabel}
         onBack={onBack}
-        onRetry={() => setScreen("form")}
+        onRetry={() => {
+          // Safe path: record purchase and go home
+          onConfirmPurchase(txDetails);
+        }}
         onPostpone={() => onPostpone({ name: itemName, price: amount, provider: providerLabel, duration })}
         onProceed={() => setScreen("proceed")}
         currency={currency}
@@ -501,12 +724,30 @@ export default function Simulation({ onBack, onPostpone, onProceed, currency, on
   }
 
   if (screen === "proceed") {
+    const txDetails = { name: itemName, amount, monthlyPay, provider: providerLabel, duration };
     return (
       <ProceedAnywayScreen
         itemName={itemName}
         amount={amount}
         duration={duration}
-        onDone={onProceed}
+        onDone={() => {
+          // High-risk path: record purchase AND trigger danger mode
+          onProceed(txDetails);
+        }}
+      />
+    );
+  }
+
+  if (screen === "pool_blocked") {
+    return (
+      <DailyPoolBlockedScreen
+        currency={currency}
+        monthlyIncome={monthlyIncome}
+        fixedTotal={fixedTotal}
+        bnplDue={bnplDueThisCycle}
+        savingsAmt={savingsAmt}
+        dailyPool={dailyPool}
+        onBack={() => setScreen("form")}
       />
     );
   }
@@ -548,29 +789,362 @@ export default function Simulation({ onBack, onPostpone, onProceed, currency, on
           </div>
         </div>
 
-        {/* ── Provider chips ── */}
-        <div style={{ display: "flex", gap: 8, marginTop: 16, overflowX: "auto", paddingBottom: 8, scrollbarWidth: "none" }}>
-          {providers.map(p => {
-            const isActive = provider === p.id;
-            return (
-              <button
-                key={p.id}
-                onClick={() => setProvider(p.id)}
-                style={{
-                  flexShrink: 0, height: 40, padding: "0 20px",
-                  borderRadius: 9999, border: "none", cursor: "pointer",
-                  fontSize: 14, fontWeight: isActive ? 600 : 500,
-                  background: isActive ? "#1ff91f" : "#F1F5F9",
-                  color: isActive ? "#0F172A" : "#64748B",
-                  boxShadow: isActive ? "0 4px 14px rgba(31,249,31,0.3)" : "none",
-                  transition: "all 0.15s",
-                }}
-              >
-                {p.label}
-              </button>
-            );
-          })}
+        {/* ── Category Payment Method Selector (Shopee / Atome / Lazada style) ── */}
+        <div style={{ marginTop: 24 }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
+            <h3 style={{ fontSize: 16, fontWeight: 700, color: "#0F172A", margin: 0 }}>
+              Payment Method Provider
+            </h3>
+            <span style={{ fontSize: 12, color: "#64748B", fontWeight: 500 }}>
+              {providers.length} available
+            </span>
+          </div>
+
+          <div style={{ display: "flex", alignItems: "center", gap: 8, width: "100%" }}>
+            {/* Horizontal scroll wrapper with minWidth: 0 to prevent stretching */}
+            <div style={{
+              flex: 1, minWidth: 0, display: "flex", gap: 10,
+              overflowX: "auto", paddingBottom: 6, paddingTop: 4,
+              scrollbarWidth: "none", alignItems: "center",
+              WebkitOverflowScrolling: "touch"
+            }}>
+              {providers.map(p => {
+                const isActive = provider === p.id;
+                const iconName = getProviderIcon(p.label);
+
+                return (
+                  <div key={p.id} style={{ position: "relative", flexShrink: 0, display: "flex", alignItems: "center" }}>
+                    <button
+                      onClick={() => setProvider(p.id)}
+                      style={{
+                        height: 44,
+                        padding: isEditingProviders ? "0 34px 0 14px" : "0 18px",
+                        borderRadius: 16,
+                        border: isActive ? "2px solid #1ff91f" : "1.5px solid #E2E8F0",
+                        cursor: "pointer",
+                        fontSize: 13, fontWeight: isActive ? 700 : 600,
+                        background: isActive ? "rgba(31,249,31,0.12)" : "#FFFFFF",
+                        color: isActive ? "#0F172A" : "#475569",
+                        boxShadow: isActive ? "0 4px 12px rgba(31,249,31,0.2)" : "0 1px 3px rgba(0,0,0,0.03)",
+                        display: "flex", alignItems: "center", gap: 8,
+                        transition: "all 0.2s cubic-bezier(0.16, 1, 0.3, 1)",
+                        whiteSpace: "nowrap"
+                      }}
+                    >
+                      <span className="material-symbols-outlined" style={{
+                        fontSize: 18,
+                        color: isActive ? "#059669" : "#64748B"
+                      }}>
+                        {iconName}
+                      </span>
+                      <span>{p.label}</span>
+                      {isActive && (
+                        <span className="material-symbols-outlined" style={{ fontSize: 16, color: "#10B981", fontWeight: 700 }}>
+                          check_circle
+                        </span>
+                      )}
+                    </button>
+
+                    {/* Inline Delete Button when in Edit mode */}
+                    {isEditingProviders && (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDeleteProvider(p.id);
+                        }}
+                        title={`Delete ${p.label}`}
+                        style={{
+                          position: "absolute",
+                          right: 6,
+                          width: 22, height: 22,
+                          borderRadius: "50%",
+                          background: "#EF4444", color: "#ffffff",
+                          border: "none", cursor: "pointer",
+                          display: "flex", alignItems: "center", justifyContent: "center",
+                          padding: 0, boxShadow: "0 2px 6px rgba(239,68,68,0.4)",
+                          transition: "transform 0.15s",
+                        }}
+                        onMouseEnter={e => e.currentTarget.style.transform = "scale(1.15)"}
+                        onMouseLeave={e => e.currentTarget.style.transform = "scale(1)"}
+                      >
+                        <span className="material-symbols-outlined" style={{ fontSize: 13, fontWeight: 700 }}>close</span>
+                      </button>
+                    )}
+                  </div>
+                );
+              })}
+
+              {/* Inline Add Button or Input */}
+              {isAddingProvider ? (
+                <div style={{
+                  display: "flex", alignItems: "center", gap: 6, background: "#FFFFFF",
+                  borderRadius: 16, padding: "0 8px 0 12px", height: 44, flexShrink: 0,
+                  border: "2px solid #1ff91f", boxShadow: "0 0 0 3px rgba(31,249,31,0.2)"
+                }}>
+                  <input
+                    value={newProviderName}
+                    onChange={e => setNewProviderName(e.target.value)}
+                    placeholder="e.g. SPayLater..."
+                    autoFocus
+                    style={{
+                      border: "none", background: "transparent", outline: "none",
+                      width: 110, fontSize: 13, fontWeight: 600, color: "#0F172A",
+                      fontFamily: "inherit"
+                    }}
+                    onKeyDown={e => {
+                      if (e.key === "Enter") handleAddProvider();
+                      if (e.key === "Escape") { setIsAddingProvider(false); setNewProviderName(""); }
+                    }}
+                  />
+                  <button
+                    onClick={handleAddProvider}
+                    style={{
+                      background: "#1ff91f", color: "#000", border: "none",
+                      borderRadius: 10, width: 28, height: 28, cursor: "pointer",
+                      display: "flex", alignItems: "center", justifyContent: "center"
+                    }}
+                    title="Confirm Add"
+                  >
+                    <span className="material-symbols-outlined" style={{ fontSize: 16, fontWeight: 700 }}>check</span>
+                  </button>
+                  <button
+                    onClick={() => { setIsAddingProvider(false); setNewProviderName(""); }}
+                    style={{
+                      background: "transparent", color: "#64748B", border: "none",
+                      borderRadius: 10, width: 26, height: 26, cursor: "pointer",
+                      display: "flex", alignItems: "center", justifyContent: "center"
+                    }}
+                    title="Cancel"
+                  >
+                    <span className="material-symbols-outlined" style={{ fontSize: 16 }}>close</span>
+                  </button>
+                </div>
+              ) : (
+                <button
+                  onClick={() => setIsAddingProvider(true)}
+                  style={{
+                    flexShrink: 0, height: 44, padding: "0 16px", borderRadius: 16,
+                    border: "2px dashed #CBD5E1", background: "rgba(248,250,252,0.8)",
+                    color: "#334155", cursor: "pointer", fontSize: 13, fontWeight: 600,
+                    display: "flex", alignItems: "center", gap: 6, transition: "all 0.15s"
+                  }}
+                  onMouseEnter={e => {
+                    e.currentTarget.style.borderColor = "#1ff91f";
+                    e.currentTarget.style.background = "rgba(31,249,31,0.08)";
+                  }}
+                  onMouseLeave={e => {
+                    e.currentTarget.style.borderColor = "#CBD5E1";
+                    e.currentTarget.style.background = "rgba(248,250,252,0.8)";
+                  }}
+                  title="Add payment provider option"
+                >
+                  <span className="material-symbols-outlined" style={{ fontSize: 18 }}>add</span>
+                  Add Method
+                </button>
+              )}
+            </div>
+
+            {/* Quick Edit Modal Button */}
+            <button
+              onClick={() => {
+                setShowEditModal(true);
+                setIsEditingProviders(prev => !prev);
+              }}
+              title="Edit payment provider options"
+              style={{
+                flexShrink: 0, height: 44, width: 44, borderRadius: 16,
+                border: isEditingProviders || showEditModal ? "1.5px solid #1ff91f" : "1.5px solid #CBD5E1",
+                background: isEditingProviders || showEditModal ? "rgba(31,249,31,0.15)" : "#F8FAFC",
+                color: isEditingProviders || showEditModal ? "#0F172A" : "#64748B",
+                cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
+                boxShadow: isEditingProviders || showEditModal ? "0 2px 8px rgba(31,249,31,0.25)" : "none",
+                transition: "all 0.2s"
+              }}
+            >
+              <span className="material-symbols-outlined" style={{ fontSize: 20, fontWeight: 600 }}>
+                {isEditingProviders || showEditModal ? "check" : "settings"}
+              </span>
+            </button>
+          </div>
         </div>
+
+        {/* ── Manage Providers Modal ── */}
+        {showEditModal && (
+          <div style={{
+            position: "fixed", top: 0, left: 0, right: 0, bottom: 0,
+            background: "rgba(15,23,42,0.6)", backdropFilter: "blur(4px)",
+            zIndex: 9999, display: "flex", alignItems: "center", justifyContent: "center",
+            padding: 16
+          }}>
+            <div style={{
+              background: "#ffffff", borderRadius: 24, padding: "24px",
+              width: "100%", maxWidth: 400, boxShadow: "0 20px 40px rgba(0,0,0,0.25)",
+              display: "flex", flexDirection: "column", gap: 20
+            }}>
+              {/* Header */}
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                  <div style={{ width: 36, height: 36, borderRadius: "50%", background: "rgba(31,249,31,0.15)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    <span className="material-symbols-outlined" style={{ fontSize: 20, color: "#0F172A" }}>edit</span>
+                  </div>
+                  <div>
+                    <h3 style={{ fontSize: 17, fontWeight: 700, color: "#0F172A", margin: 0 }}>Manage Payment Options</h3>
+                    <p style={{ fontSize: 12, color: "#64748B", margin: 0 }}>Add Shopee, Atome, Lazada or custom methods</p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setShowEditModal(false)}
+                  style={{ background: "transparent", border: "none", cursor: "pointer", color: "#64748B", padding: 4 }}
+                >
+                  <span className="material-symbols-outlined" style={{ fontSize: 22 }}>close</span>
+                </button>
+              </div>
+
+              {/* Add New Option Input */}
+              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                <label style={{ fontSize: 11, fontWeight: 700, color: "#475569", textTransform: "uppercase", letterSpacing: "0.06em" }}>
+                  Add New Provider
+                </label>
+                <div style={{ display: "flex", gap: 8 }}>
+                  <input
+                    value={newProviderName}
+                    onChange={e => setNewProviderName(e.target.value)}
+                    placeholder="e.g. SPayLater, Atome, TikTok Pay"
+                    onKeyDown={e => { if (e.key === "Enter") handleAddProvider(); }}
+                    style={{
+                      flex: 1, height: 44, background: "#F8FAFC", border: "1.5px solid #CBD5E1",
+                      borderRadius: 14, padding: "0 14px", fontSize: 14, fontWeight: 500,
+                      color: "#0F172A", outline: "none", fontFamily: "inherit"
+                    }}
+                  />
+                  <button
+                    onClick={handleAddProvider}
+                    disabled={!newProviderName.trim()}
+                    style={{
+                      height: 44, padding: "0 18px", borderRadius: 14,
+                      background: newProviderName.trim() ? "#1ff91f" : "#E2E8F0",
+                      color: newProviderName.trim() ? "#0F172A" : "#94A3B8",
+                      border: "none", fontWeight: 700, fontSize: 14, cursor: newProviderName.trim() ? "pointer" : "not-allowed",
+                      display: "flex", alignItems: "center", gap: 4, transition: "all 0.15s"
+                    }}
+                  >
+                    <span className="material-symbols-outlined" style={{ fontSize: 18 }}>add</span>
+                    Add
+                  </button>
+                </div>
+              </div>
+
+              {/* Existing Options List */}
+              <div style={{ display: "flex", flexDirection: "column", gap: 8, maxHeight: 220, overflowY: "auto" }}>
+                <label style={{ fontSize: 11, fontWeight: 700, color: "#475569", textTransform: "uppercase", letterSpacing: "0.06em" }}>
+                  Active Options ({providers.length})
+                </label>
+                {providers.length === 0 ? (
+                  <p style={{ fontSize: 13, color: "#94A3B8", fontStyle: "italic", textAlign: "center", margin: "12px 0" }}>
+                    No options available. Type above to add one!
+                  </p>
+                ) : (
+                  providers.map(p => (
+                    <div
+                      key={p.id}
+                      style={{
+                        display: "flex", alignItems: "center", justifyContent: "space-between",
+                        padding: "10px 12px", background: provider === p.id ? "rgba(31,249,31,0.08)" : "#F8FAFC",
+                        border: `1px solid ${provider === p.id ? "rgba(31,249,31,0.4)" : "#E2E8F0"}`,
+                        borderRadius: 14, transition: "all 0.15s"
+                      }}
+                    >
+                      {editingId === p.id ? (
+                        <div style={{ display: "flex", alignItems: "center", gap: 6, flex: 1, marginRight: 8 }}>
+                          <input
+                            value={editingLabel}
+                            onChange={e => setEditingLabel(e.target.value)}
+                            autoFocus
+                            style={{
+                              flex: 1, height: 32, background: "#fff", border: "1px solid #1ff91f",
+                              borderRadius: 8, padding: "0 8px", fontSize: 13, fontWeight: 600, color: "#0F172A"
+                            }}
+                            onKeyDown={e => {
+                              if (e.key === "Enter") {
+                                handleRenameProvider(p.id, editingLabel);
+                                setEditingId(null);
+                              }
+                              if (e.key === "Escape") setEditingId(null);
+                            }}
+                          />
+                          <button
+                            onClick={() => {
+                              handleRenameProvider(p.id, editingLabel);
+                              setEditingId(null);
+                            }}
+                            style={{ background: "#1ff91f", border: "none", borderRadius: 8, width: 32, height: 32, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}
+                          >
+                            <span className="material-symbols-outlined" style={{ fontSize: 16, color: "#0F172A" }}>check</span>
+                          </button>
+                        </div>
+                      ) : (
+                        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                          <span className="material-symbols-outlined" style={{ fontSize: 18, color: "#64748B" }}>
+                            {getProviderIcon(p.label)}
+                          </span>
+                          <span style={{ fontSize: 14, fontWeight: 600, color: "#0F172A" }}>
+                            {p.label}
+                          </span>
+                          {provider === p.id && (
+                            <span style={{ fontSize: 10, fontWeight: 700, background: "#1ff91f", color: "#0F172A", borderRadius: 99, padding: "2px 8px" }}>
+                              Selected
+                            </span>
+                          )}
+                        </div>
+                      )}
+
+                      <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+                        {editingId !== p.id && (
+                          <button
+                            onClick={() => {
+                              setEditingId(p.id);
+                              setEditingLabel(p.label);
+                            }}
+                            title="Rename option"
+                            style={{ background: "transparent", border: "none", color: "#64748B", cursor: "pointer", padding: 4, borderRadius: 6 }}
+                          >
+                            <span className="material-symbols-outlined" style={{ fontSize: 18 }}>edit</span>
+                          </button>
+                        )}
+                        <button
+                          onClick={() => handleDeleteProvider(p.id)}
+                          title="Delete option"
+                          style={{ background: "transparent", border: "none", color: "#EF4444", cursor: "pointer", padding: 4, borderRadius: 6 }}
+                        >
+                          <span className="material-symbols-outlined" style={{ fontSize: 18 }}>delete</span>
+                        </button>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+
+              {/* Footer */}
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", paddingTop: 8, borderTop: "1px solid #E2E8F0" }}>
+                <button
+                  onClick={handleResetProviders}
+                  style={{ background: "transparent", border: "none", color: "#64748B", fontSize: 12, fontWeight: 600, cursor: "pointer", textDecoration: "underline" }}
+                >
+                  Reset Defaults
+                </button>
+                <button
+                  onClick={() => setShowEditModal(false)}
+                  style={{
+                    height: 40, padding: "0 24px", borderRadius: 9999, background: "#0F172A",
+                    color: "#ffffff", border: "none", fontWeight: 700, fontSize: 14, cursor: "pointer"
+                  }}
+                >
+                  Done
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* ── Amount + Stats ── */}
         <div style={{ marginTop: 32, display: "flex", flexDirection: "column", gap: 12 }}>
@@ -701,20 +1275,42 @@ export default function Simulation({ onBack, onPostpone, onProceed, currency, on
           </div>
         </div>
 
+        {/* ── Pool Blocked Warning Banner ── */}
+        {isDailyPoolBlocked && (
+          <div style={{
+            marginTop: 20,
+            background: "rgba(239,68,68,0.08)",
+            border: "1.5px solid rgba(239,68,68,0.3)",
+            borderRadius: 20, padding: "14px 16px",
+            display: "flex", alignItems: "flex-start", gap: 12,
+            animation: "fadeSlideUp 0.3s ease both",
+          }}>
+            <span className="material-symbols-outlined" style={{ fontSize: 22, color: "#EF4444", flexShrink: 0, fontVariationSettings: "'FILL' 1", marginTop: 1 }}>warning</span>
+            <div style={{ flex: 1 }}>
+              <p style={{ fontSize: 13, fontWeight: 700, color: "#EF4444", margin: "0 0 3px" }}>Daily Pool Minimum Triggered — Transaction Blocked</p>
+              <p style={{ fontSize: 12, color: "#94A3B8", margin: 0, lineHeight: 1.5 }}>
+                Your monthly pool ({currency} {fmt(dailyPool)}) is below the {currency} {fmt(DAILY_POOL_MINIMUM)} minimum. Proceeding would push you into overspending. Reduce BNPL or bills to unlock.
+              </p>
+            </div>
+          </div>
+        )}
+
         {/* ── Analyse CTA ── */}
-        <div style={{ marginTop: 32, display: "flex", justifyContent: "center" }}>
+        <div style={{ marginTop: 24, display: "flex", justifyContent: "center" }}>
           <button
             id="simulate-proceed-btn"
             onClick={handleAnalyze}
             disabled={!itemName.trim()}
             style={{
               width: "100%", height: 56, borderRadius: 9999,
-              background: "#1ff91f", border: "none",
+              background: isDailyPoolBlocked ? "rgba(192,132,252,0.15)" : "#1ff91f",
+              border: isDailyPoolBlocked ? "2px solid rgba(192,132,252,0.4)" : "none",
               cursor: itemName.trim() ? "pointer" : "not-allowed",
-              color: "#0a2a0a", fontSize: 16, fontWeight: 700,
+              color: isDailyPoolBlocked ? "#c084fc" : "#0a2a0a",
+              fontSize: 16, fontWeight: 700,
               display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
-              boxShadow: "0 8px 20px rgba(31,249,31,0.25)",
-              transition: "transform 0.15s",
+              boxShadow: isDailyPoolBlocked ? "0 4px 20px rgba(192,132,252,0.2)" : "0 8px 20px rgba(31,249,31,0.25)",
+              transition: "transform 0.15s, background 0.3s",
               letterSpacing: "-0.01em", fontFamily: "inherit",
             }}
             onMouseEnter={e => { e.currentTarget.style.transform = "scale(1.02)"; }}
@@ -722,7 +1318,10 @@ export default function Simulation({ onBack, onPostpone, onProceed, currency, on
             onMouseDown={e => { e.currentTarget.style.transform = "scale(0.98)"; }}
             onMouseUp={e => { e.currentTarget.style.transform = "scale(1)"; }}
           >
-            <span>Analyse</span>
+            {isDailyPoolBlocked
+              ? <><span className="material-symbols-outlined" style={{ fontSize: 20, fontVariationSettings: "'FILL' 1" }}>lock</span><span>See Why Blocked</span></>
+              : <span>Analyse</span>
+            }
           </button>
         </div>
       </div>

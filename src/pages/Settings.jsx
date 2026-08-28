@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-export default function Settings({ onBack, danger, currency, userName, isTab, onReplayTour }) {
+export default function Settings({ onBack, danger, currency, userName, isTab, onReplayTour, spentTotal = 0, spentPct = 0, monthlyIncome = 3200, fmt }) {
   const [alertsOn, setAlertsOn] = useState(true);
 
   const P = danger ? "#d41111" : "#2bee6c";
@@ -188,6 +188,83 @@ export default function Settings({ onBack, danger, currency, userName, isTab, on
             <p style={{ fontSize: 11, color: danger ? "#d41111" : "#94A3B8", margin: "6px 0 0", fontWeight: danger ? 600 : 400, transition: "color 0.8s" }}>
               {danger ? "⚠️ Critical — avoid new spending" : "Updated just now"}
             </p>
+          </div>
+        </div>
+
+        {/* ── Monthly Quota Usage card ── */}
+        <div style={{ padding: "0 16px 20px", position: "relative", zIndex: 1 }}>
+          <div style={{
+            background: "#fff", borderRadius: 28, padding: "20px 24px",
+            boxShadow: danger ? "0 1px 4px rgba(212,17,17,0.08), 0 4px 16px rgba(212,17,17,0.06)" : "0 1px 4px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.04)",
+            border: `1px solid ${cardBorder}`,
+            transition: "border-color 0.8s, box-shadow 0.8s",
+          }}>
+            {/* Title row */}
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                <span className="material-symbols-outlined" style={{ fontSize: 18, color: spentPct >= 70 ? "#d41111" : spentPct >= 50 ? "#F59E0B" : "#059669", fontVariationSettings: "'FILL' 1", transition: "color 0.5s" }}>pie_chart</span>
+                <p style={{ fontSize: 13, fontWeight: 600, color: "#64748B", margin: 0 }}>Monthly Quota Usage</p>
+              </div>
+              <span style={{
+                fontSize: 11, fontWeight: 800, padding: "2px 10px", borderRadius: 999,
+                background: spentPct >= 70 ? "rgba(212,17,17,0.1)" : spentPct >= 50 ? "rgba(245,158,11,0.1)" : "rgba(5,150,105,0.1)",
+                color: spentPct >= 70 ? "#d41111" : spentPct >= 50 ? "#B45309" : "#059669",
+                transition: "background 0.5s, color 0.5s",
+              }}>
+                {spentPct >= 70 ? "⚠️ High" : spentPct >= 50 ? "Moderate" : "Healthy"}
+              </span>
+            </div>
+
+            {/* Percentage big number */}
+            <div style={{ display: "flex", alignItems: "baseline", gap: 4, marginBottom: 12 }}>
+              <span className="font-mono" style={{
+                fontSize: 40, fontWeight: 800, letterSpacing: "-0.04em", lineHeight: 1,
+                color: spentPct >= 70 ? "#d41111" : spentPct >= 50 ? "#B45309" : "#0F172A",
+                transition: "color 0.5s",
+              }}>
+                {Math.min(spentPct, 100).toFixed(1)}
+              </span>
+              <span style={{ fontSize: 20, fontWeight: 700, color: "#94A3B8" }}>%</span>
+              <span style={{ fontSize: 12, color: "#94A3B8", marginLeft: 4 }}>of monthly income</span>
+            </div>
+
+            {/* Progress bar */}
+            <div style={{ height: 10, background: "#F1F5F9", borderRadius: 999, overflow: "hidden", marginBottom: 10 }}>
+              <div style={{
+                height: "100%",
+                width: `${Math.min(spentPct, 100)}%`,
+                borderRadius: 999,
+                background: spentPct >= 70
+                  ? "linear-gradient(90deg, #f87171, #d41111)"
+                  : spentPct >= 50
+                    ? "linear-gradient(90deg, #fcd34d, #F59E0B)"
+                    : "linear-gradient(90deg, #6ee7b7, #059669)",
+                transition: "width 0.6s cubic-bezier(.4,0,.2,1), background 0.5s",
+                boxShadow: spentPct >= 70 ? "0 0 8px rgba(212,17,17,0.4)" : spentPct >= 50 ? "0 0 8px rgba(245,158,11,0.35)" : "0 0 8px rgba(5,150,105,0.3)",
+              }} />
+            </div>
+
+            {/* Threshold markers */}
+            <div style={{ position: "relative", height: 16, marginBottom: 4 }}>
+              <div style={{ position: "absolute", left: "50%", top: 0, display: "flex", flexDirection: "column", alignItems: "center", transform: "translateX(-50%)" }}>
+                <div style={{ width: 1, height: 6, background: "#CBD5E1" }} />
+                <span style={{ fontSize: 9, color: "#94A3B8", fontWeight: 600, whiteSpace: "nowrap" }}>50%</span>
+              </div>
+              <div style={{ position: "absolute", left: "70%", top: 0, display: "flex", flexDirection: "column", alignItems: "center", transform: "translateX(-50%)" }}>
+                <div style={{ width: 1, height: 6, background: spentPct >= 70 ? "#d41111" : "#CBD5E1", transition: "background 0.5s" }} />
+                <span style={{ fontSize: 9, color: spentPct >= 70 ? "#d41111" : "#94A3B8", fontWeight: 600, whiteSpace: "nowrap", transition: "color 0.5s" }}>70% ⚠️</span>
+              </div>
+            </div>
+
+            {/* Amount labels */}
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <span style={{ fontSize: 12, color: "#94A3B8" }}>
+                Spent: <strong style={{ color: spentPct >= 70 ? "#d41111" : "#0F172A", transition: "color 0.5s" }}>{currency} {fmt ? fmt(spentTotal) : spentTotal.toFixed(2)}</strong>
+              </span>
+              <span style={{ fontSize: 12, color: "#94A3B8" }}>
+                Income: <strong style={{ color: "#0F172A" }}>{currency} {fmt ? fmt(monthlyIncome) : monthlyIncome.toFixed(2)}</strong>
+              </span>
+            </div>
           </div>
         </div>
 

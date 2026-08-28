@@ -75,6 +75,9 @@ export default function App() {
   const [loggedSpending, setLoggedSpending] = useState([]);
   const [cycleStartDay, setCycleStartDay] = useState(28);
 
+  // Simulation BNPL tracker — purchases confirmed in Simulation Page
+  const [simulatedBnplItems, setSimulatedBnplItems] = useState([]);
+
   const handleProceed = () => {
     setDangerMode(true);
     setActiveTab("home");
@@ -84,13 +87,41 @@ export default function App() {
     setActiveTab("home");
   };
 
-  // Budget Coach Calcs
-  const bnplDueThisCycle = DEBT_STACK.reduce((s, d) => s + d.amount, 0);
-  const fixedTotal = fixedBills.reduce((s, b) => s + b.amount, 0);
-  const savingsAmt = (monthlyIncome * savingsTarget) / 100;
+  // Called when user confirms a BNPL purchase in Simulation
+  const handleConfirmPurchase = ({ name, amount: purchaseAmt, monthlyPay, provider, duration }) => {
+    setSimulatedBnplItems(prev => [
+      ...prev,
+      { id: Date.now(), name, amount: purchaseAmt, monthlyPay, provider, duration, date: new Date().toISOString() }
+    ]);
+    setActiveTab("home");
+  };
 
-  // Emergency Mode Trigger
-  const availableIncome = monthlyIncome - fixedTotal;
+  // Same as above but also sets danger mode (high-risk path)
+  const handleConfirmPurchaseHighRisk = (details) => {
+    if (details) handleConfirmPurchase(details);
+    setDangerMode(true);
+    setActiveTab("home");
+  };
+
+  // ── LOGICAL BUDGET & INCOME CALCULATIONS ────────────────────────────────
+
+  // 1. Calculate dynamically logged extra income from transactions
+  const totalLoggedIncome = loggedSpending
+    .filter(log => log.type === "income" || log.category === "Income")
+    .reduce((sum, log) => sum + log.amount, 0);
+
+  // 2. Total active income (Base + Dynamically Added Income)
+  const totalIncome = monthlyIncome + totalLoggedIncome;
+
+  // 3. Fixed Bills & Savings Allocation based on Total Income
+  const staticBnpl = DEBT_STACK.reduce((s, d) => s + d.amount, 0);
+  const simulatedBnplTotal = simulatedBnplItems.reduce((s, i) => s + i.monthlyPay, 0);
+  const bnplDueThisCycle = staticBnpl + simulatedBnplTotal;
+  const fixedTotal = fixedBills.reduce((s, b) => s + b.amount, 0);
+  const savingsAmt = (totalIncome * savingsTarget) / 100;
+
+  // 4. Emergency Mode Trigger calculations reflecting Total Income
+  const availableIncome = totalIncome - fixedTotal;
   const shortfall = bnplDueThisCycle - availableIncome;
   const dailyEssentialBurnRate = fixedTotal / 30;
   const survivalScoreDays = liquidCash / (dailyEssentialBurnRate || 1);
@@ -111,6 +142,7 @@ export default function App() {
 
   const showEmergencyBadge = isEmergencyTriggered && !emergencyAcknowledged;
 
+  // 5. Days left in cycle
   const today = new Date();
   let nextPayday = new Date(today.getFullYear(), today.getMonth(), cycleStartDay);
   if (today.getDate() >= cycleStartDay) {
@@ -118,13 +150,19 @@ export default function App() {
   }
   const daysLeft = Math.max(1, Math.ceil((nextPayday - today) / (1000 * 60 * 60 * 24)));
 
-  const spentTotal = loggedSpending.reduce((s, log) => s + log.amount, 0);
-  const dailyPoolMonthly = monthlyIncome - fixedTotal - bnplDueThisCycle - savingsAmt;
-  const remainingPool = dailyPoolMonthly - spentTotal;
+  // 6. Expense & Daily Budget Logic
+  const expenseTotal = loggedSpending
+    .filter(log => log.type !== "income" && log.category !== "Income")
+    .reduce((s, log) => s + log.amount, 0);
+
+  // Pool calculated using Total Income
+  const dailyPoolMonthly = totalIncome - fixedTotal - bnplDueThisCycle - savingsAmt;
+  const remainingPool = dailyPoolMonthly - expenseTotal;
   const dailyBudget = Math.max(0, remainingPool / daysLeft);
 
   const spentToday = loggedSpending
     .filter(log => new Date(log.date).toDateString() === today.toDateString())
+    .filter(log => log.type !== "income" && log.category !== "Income")
     .reduce((s, log) => s + log.amount, 0);
 
   const remainingToday = dailyBudget - spentToday;
@@ -140,16 +178,24 @@ export default function App() {
   // Shared props bundles
   const coachProps = {
     currency: activeCurrency,
-    monthlyIncome, fixedBills, savingsTarget,
+    monthlyIncome: totalIncome, // Pass total income to Coach for consistent UI display
+    fixedBills, savingsTarget,
     loggedSpending, onLogSpending: (s) => setLoggedSpending(prev => [s, ...prev]),
     cycleStartDay, dailyBudget, remainingToday, pctToday,
-    coachStatusColor, coachStatusText, bnplDueThisCycle, daysLeft, fmt
+    coachStatusColor, coachStatusText, bnplDueThisCycle, daysLeft, fmt,
+    simulatedBnplItems, // tracked simulation purchases for BudgetCoach breakdown
   };
+
+  // Spending % based on total available income
+  const spentPct = totalIncome > 0 ? (expenseTotal / totalIncome) * 100 : 0;
 
   const profileProps = {
     danger: dangerMode,
     currency: activeCurrency,
     userName: activeUserName,
+    monthlyIncome: totalIncome,
+    spentTotal: expenseTotal,
+    spentPct,
     onReplayTour: () => {
       setTourActive(true);
       setTourMandatory(false);
@@ -195,9 +241,14 @@ export default function App() {
           <Simulation
             onBack={() => setActiveTab("home")}
             onPostpone={handlePostpone}
-            onProceed={handleProceed}
+            onProceed={handleConfirmPurchaseHighRisk}
             currency={activeCurrency}
             onScreenChange={setSimScreen}
+            monthlyIncome={totalIncome}
+            fixedBills={fixedBills}
+            bnplDueThisCycle={bnplDueThisCycle}
+            savingsTarget={savingsTarget}
+            onConfirmPurchase={handleConfirmPurchase}
           />
         );
       case "profile":

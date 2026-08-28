@@ -126,6 +126,22 @@ export default function AppShell({
                             />
                         )}
 
+                        {/* Tour Click-Blocker — blocks ALL page interactions during the tour */}
+                        {tourActive && (
+                            <div
+                                style={{
+                                    position: "absolute",
+                                    inset: 0,
+                                    zIndex: 9997,
+                                    background: "transparent",
+                                    cursor: "not-allowed",
+                                }}
+                                onClick={e => e.stopPropagation()}
+                                onMouseDown={e => e.stopPropagation()}
+                                onPointerDown={e => e.stopPropagation()}
+                            />
+                        )}
+
                         {/* Product Tour Overlay */}
                         {tourActive && (
                             <TourCard

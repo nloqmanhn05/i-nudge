@@ -121,9 +121,6 @@ export default function Home({
             <h2 style={{ fontSize: 20, fontWeight: 800, color: "#111", margin: 0 }}>
               {dangerMode ? "Credit Utilization" : "Shadow Debt Stack"}
             </h2>
-            <button style={{ fontSize: 14, fontWeight: 600, color: dangerMode ? "#d41111" : "#13ecc8", background: "none", border: "none", cursor: "pointer" }}>
-              View All
-            </button>
           </div>
           <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
             {DEBT_STACK.map((item) => <DebtCard key={item.id} item={item} danger={dangerMode} currency={activeCurrency} />)}
