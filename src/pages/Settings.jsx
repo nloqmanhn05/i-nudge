@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-export default function Settings({ onBack, danger, currency, userName, isTab, onReplayTour, spentTotal = 0, spentPct = 0, monthlyIncome = 3200, fmt }) {
+export default function Settings({ onBack, danger, currency, userName, isTab, onReplayTour, onLogout, spentTotal = 0, spentPct = 0, monthlyIncome = 3200, fmt }) {
   const [alertsOn, setAlertsOn] = useState(true);
 
   const P = danger ? "#d41111" : "#2bee6c";
@@ -87,8 +87,14 @@ export default function Settings({ onBack, danger, currency, userName, isTab, on
           <h1 style={{ fontSize: 20, fontWeight: 700, color: danger ? "#7f1d1d" : "#0F172A", margin: 0, flex: 1, textAlign: "center", letterSpacing: "-0.02em", transition: "color 0.8s" }}>
             Profile
           </h1>
-          <button style={{ width: 40, height: 40, borderRadius: "50%", border: "none", background: danger ? "rgba(212,17,17,0.08)" : "transparent", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", position: "relative", transition: "background 0.8s" }}>
-            <span className="material-symbols-outlined" style={{ fontSize: 22, color: danger ? "#d41111" : "#0F172A", transition: "color 0.8s" }}>settings</span>
+          <button
+            onClick={onLogout}
+            title="Log Out"
+            style={{ width: 40, height: 40, borderRadius: "50%", border: "none", background: danger ? "rgba(212,17,17,0.08)" : "rgba(15,23,42,0.04)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", position: "relative", transition: "background 0.3s, transform 0.15s" }}
+            onMouseEnter={e => e.currentTarget.style.transform = "scale(1.08)"}
+            onMouseLeave={e => e.currentTarget.style.transform = "scale(1)"}
+          >
+            <span className="material-symbols-outlined" style={{ fontSize: 22, color: danger ? "#d41111" : "#0F172A", transition: "color 0.8s" }}>logout</span>
             {danger && <span style={{ position: "absolute", top: 8, right: 8, width: 7, height: 7, borderRadius: "50%", background: "#d41111", boxShadow: "0 0 0 2px #fff5f5", animation: "safe-pulse 1s ease-in-out infinite" }} />}
           </button>
         </div>

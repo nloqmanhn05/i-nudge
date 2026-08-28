@@ -227,6 +227,12 @@ export default function App() {
     monthlyIncome: totalIncome,
     spentTotal: expenseTotal,
     spentPct,
+    onLogout: () => {
+      setOnboarded(false);
+      setActiveTab("home");
+      setTourActive(false);
+      showToast("Logged out. Please activate your account again.", "info");
+    },
     onReplayTour: () => {
       setTourActive(true);
       setTourMandatory(false);

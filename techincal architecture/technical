@@ -1,0 +1,194 @@
+# i-nudge: Technical Architecture
+
+This document defines the technical architecture, component hierarchy, state management, and technology stack for the **i-nudge** application.
+
+---
+
+## 1. High-Level Technical Architecture
+
+```mermaid
+graph TB
+    subgraph CLIENT["Client-Side SPA (Web Browser)"]
+        direction TB
+        HTML["index.html<br/>• Root HTML Document<br/>• Google Material Symbols & Fonts"]
+        VITE["Vite 5.1 Build & Dev Server<br/>• Hot Module Replacement (HMR)<br/>• Fast PostCSS & Tailwind Bundling"]
+        
+        subgraph REACT_LAYER["React 18 Component Tree"]
+            direction TB
+            MAIN["main.jsx<br/>• React Entry Point<br/>• Global ErrorBoundary"]
+            APP["App.jsx<br/>• Central State Hub<br/>• Budget / Debt Calculation Engine<br/>• Navigation & Toast State Manager"]
+            
+            subgraph LAYOUT["Layout & Shell Layer"]
+                SHELL["AppShell.jsx<br/>• Mobile Viewport Shell<br/>• Keyboard Navigation (Keys 1-5, Esc)<br/>• Global Toast / Snackbar Bar"]
+                NAV["BottomNav.jsx<br/>• 5-Tab Navigation Bar<br/>• Active Tab Highlights & Emergency Badges"]
+                TOUR["TourCard.jsx<br/>• Interactive Onboarding Tour Overlay<br/>• Multi-step Navigation & Skip Flow"]
+            end
+            
+            subgraph PAGES["Page Modules"]
+                HOME["Home.jsx<br/>• Liquidity & Daily Allowance Hero<br/>• Danger Mode Revert Banner<br/>• Shadow Debt Stack List"]
+                COACH["BudgetCoach.jsx<br/>• Daily Spending Target Calculator<br/>• Expense & Extra Income Logger<br/>• 5-Second Undo Action System"]
+                SIM["Simulation.jsx<br/>• BNPL Affordability Analyzer<br/>• Custom Payment Provider Manager<br/>• Multi-Stage Risk Assessment"]
+                EMERG["Emergency.jsx<br/>• Survival Score Calculator<br/>• Priority Action Checklist<br/>• Hardship Program Directory"]
+                PROF["Profile.jsx / Settings.jsx<br/>• Financial Health Status<br/>• Notification Toggles<br/>• Logout & Tour Replay"]
+            end
+            
+            subgraph UI_KIT["Reusable UI Components"]
+                DEBT_CARD["DebtCard.jsx<br/>• BNPL Liability Card with Limit Progress"]
+                ECG_CANVAS["EcgCanvas.jsx<br/>• Dynamic Heartbeat Pulse Waveform"]
+                ONBOARD["OnboardingFlow.jsx<br/>• First-time User Activation Form"]
+            end
+        end
+        
+        subgraph DATA_LAYER["Data & Persistence"]
+            MOCK["mockData.js<br/>• DEBT_STACK<br/>• NAV_ITEMS<br/>• TOUR_STEPS<br/>• HARDSHIP_INFO"]
+            LS[("Browser localStorage<br/>• nudge_providers<br/>• nudge_has_seen_tour<br/>• nudge_emergency_acknowledged")]
+        end
+        
+        subgraph STYLES["Design System & Styles"]
+            CSS["index.css<br/>• CSS Custom Properties & Brand Tokens<br/>• Keyframe Animations & Safe Pulse"]
+            TW["tailwind.config.js<br/>• Tailwind JIT Compiler & Utilities"]
+        end
+    end
+
+    HTML --> MAIN
+    MAIN --> APP
+    APP --> SHELL
+    SHELL --> NAV
+    SHELL --> TOUR
+    APP --> HOME
+    APP --> COACH
+    APP --> SIM
+    APP --> EMERG
+    APP --> PROF
+    APP --> ONBOARD
+    HOME --> DEBT_CARD
+    HOME --> ECG_CANVAS
+    APP --> MOCK
+    APP <--> LS
+    SIM <--> LS
+    VITE --> HTML
+    CSS --> SHELL
+    TW --> CSS
+```
+
+---
+
+## 2. Component Hierarchy & Data Flow
+
+```mermaid
+graph TD
+    ROOT["ReactDOM.createRoot()"] --> EB["ErrorBoundary"]
+    EB --> APP["App.jsx (Central State Hub)"]
+
+    APP -->|"activeTab, dangerMode, toast, tour*"| SHELL["AppShell.jsx"]
+    SHELL -->|"Header / Shortcuts / Toast"| SHELL_UI["Viewport Shell"]
+    SHELL --> BNAV["BottomNav.jsx"]
+    SHELL --> TC["TourCard.jsx (Overlay)"]
+
+    SHELL -->|"renders active route"| ROUTE_ROUTER{"activeTab Router"}
+
+    ROUTE_ROUTER -->|"!onboarded"| ONBOARD["OnboardingFlow.jsx"]
+    ROUTE_ROUTER -->|"home"| HOME["Home.jsx"]
+    ROUTE_ROUTER -->|"coach"| COACH["BudgetCoach.jsx"]
+    ROUTE_ROUTER -->|"simulation"| SIM["Simulation.jsx"]
+    ROUTE_ROUTER -->|"emergency"| EMERG["Emergency.jsx"]
+    ROUTE_ROUTER -->|"profile"| PROF["Profile.jsx -> Settings.jsx"]
+
+    ONBOARD -->|"onComplete(currency, userName)"| APP
+    HOME -->|"onNavigate(tab), onExitDangerMode()"| APP
+    COACH -->|"onLogSpending(), setLoggedSpending(), showToast()"| APP
+    SIM -->|"onConfirmPurchase(), onProceed(), onPostpone()"| APP
+    EMERG -->|"onAcknowledge()"| APP
+    PROF -->|"onLogout(), onReplayTour()"| APP
+
+    HOME --> DEBT_STACK_UI["DebtCard.jsx x N"]
+    HOME --> ECG_CANVAS["EcgCanvas.jsx"]
+    SIM --> SIM_FORM["Simulation Form"]
+    SIM --> SIM_LOAD["SimLoadingScreen"]
+    SIM --> SIM_RESULT["SimResultScreen"]
+    SIM --> SIM_PROCEED["ProceedAnywayScreen"]
+    SIM --> SIM_BLOCKED["DailyPoolBlockedScreen"]
+```
+
+---
+
+## 3. State & Persistence Architecture
+
+```mermaid
+flowchart LR
+    subgraph REACT_STATE["React State (Managed in App.jsx)"]
+        direction TB
+        S1["onboarded (boolean)"]
+        S2["activeTab ('home' | 'coach' | 'simulation' | 'emergency' | 'profile')"]
+        S3["dangerMode (boolean)"]
+        S4["monthlyIncome + loggedIncome (number)"]
+        S5["fixedBills[] (array of bill objects)"]
+        S6["loggedSpending[] (array of transactions)"]
+        S7["simulatedBnplItems[] (array of active simulation debts)"]
+        S8["savingsTarget (percentage number)"]
+        S9["liquidCash (reserve number)"]
+        S10["toast ({ message, type, canUndo })"]
+        S11["tourActive / tourPageIndex / tourElemIndex"]
+    end
+
+    subgraph LOCAL_STORAGE["Browser LocalStorage"]
+        direction TB
+        LS1["nudge_has_seen_tour<br/>Tracks tour completion"]
+        LS2["nudge_emergency_acknowledged<br/>Tracks crisis acknowledgement"]
+        LS3["nudge_providers<br/>Custom added payment providers"]
+    end
+
+    subgraph STATIC_DATA["Static Config (mockData.js)"]
+        direction TB
+        D1["DEBT_STACK (Default BNPL liabilities)"]
+        D2["NAV_ITEMS (Tab definitions & icons)"]
+        D3["TOUR_STEPS (4-stage tour configuration)"]
+        D4["HARDSHIP_INFO (Provider deferral programs)"]
+    end
+
+    S11 <-->|"read / write"| LS1
+    S9 <-->|"read / write"| LS2
+    LOCAL_STORAGE <-->|"Simulation Provider Manager"| LS3
+
+    D1 -->|"imported into"| REACT_STATE
+    D2 -->|"imported into"| REACT_STATE
+    D3 -->|"imported into"| REACT_STATE
+
+    style REACT_STATE fill:#ecfdf5,stroke:#059669,stroke-width:2px
+    style LOCAL_STORAGE fill:#eff6ff,stroke:#3b82f6,stroke-width:2px
+    style STATIC_DATA fill:#fdf4ff,stroke:#a855f7,stroke-width:2px
+```
+
+---
+
+## 4. Technology Stack
+
+```mermaid
+mindmap
+  root((i-nudge))
+    Core Framework
+      React 18.2
+      Vite 5.1
+      JavaScript ES Modules
+    Styling System
+      Tailwind CSS 3.4
+      Vanilla CSS Custom Properties
+      Google Material Symbols
+    Typography
+      Inter
+      JetBrains Mono
+      Google Sans Display
+    State Management
+      React useState & useEffect
+      useRef for Undo Actions
+      Browser LocalStorage
+    Build & Bundling
+      Vite JIT Bundler
+      PostCSS + Autoprefixer
+      ESLint Configuration
+    UX Principles
+      Shneiderman 8 Golden Rules
+      Keyboard Shortcuts 1 to 5 + Esc
+      Toast Feedback System with 5s Undo
+      Psychological Friction Barrier
+```

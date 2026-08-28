@@ -1,0 +1,178 @@
+# i-nudge: System Flow & Implementation Details
+
+This document defines the system flows, state machine progressions, budget calculation pipeline, and decision engines for the **i-nudge** application.
+
+---
+
+## 1. End-to-End User Journey & State Transitions
+
+```mermaid
+stateDiagram-v2
+    [*] --> Onboarding: First-Time User
+
+    state Onboarding {
+        EnterName: Enter User Name
+        Activate: Click Activate i-nudge
+        EnterName --> Activate
+    }
+
+    Onboarding --> ProductTour: Account Activated (onboarded = true)
+
+    state ProductTour {
+        StepHome: Step 1: Liquidity & Debt Stack
+        StepEmergency: Step 2: Emergency Priorities
+        StepSimulation: Step 3: Purchase Simulation
+        StepCoach: Step 4: Daily Budget Coach
+        StepHome --> StepEmergency
+        StepEmergency --> StepSimulation
+        StepSimulation --> StepCoach
+    }
+
+    ProductTour --> Dashboard: Tour Complete / Skipped
+
+    state Dashboard {
+        [*] --> HomeTab
+        HomeTab --> CoachTab: Tab 2 / Key '2'
+        HomeTab --> SimTab: Tab 3 / Key '3'
+        HomeTab --> EmergencyTab: Tab 4 / Key '4'
+        HomeTab --> ProfileTab: Tab 5 / Key '5'
+
+        CoachTab --> HomeTab: Tab 1 / Key '1'
+        SimTab --> HomeTab: Tab 1 / Key '1'
+        EmergencyTab --> HomeTab: Tab 1 / Key '1'
+        ProfileTab --> HomeTab: Tab 1 / Key '1'
+    }
+
+    state SimTab {
+        [*] --> ConfigForm
+        ConfigForm --> BlockedScreen: Daily Pool < RM 300
+        BlockedScreen --> ConfigForm: Adjust Parameters
+
+        ConfigForm --> LoadingScreen: Click Analyse (Enter)
+        LoadingScreen --> RiskEvaluation: 3s Animated Evaluation
+
+        state RiskEvaluation {
+            [*] --> ImpactCheck
+            ImpactCheck --> SafeScreen: Total Impact < 50%
+            ImpactCheck --> HighRiskScreen: Total Impact >= 50%
+        }
+
+        SafeScreen --> ConfirmBuy: Confirm Purchase
+        ConfirmBuy --> HomeTab: BNPL Added to Stack
+
+        HighRiskScreen --> Postpone: Postpone to Next Month
+        Postpone --> HomeTab: Purchase Postponed
+
+        HighRiskScreen --> ProceedAnywayFlow: Continue to Buy
+        
+        state ProceedAnywayFlow {
+            ViewHours: View Wage Slavery Hours
+            ViewDisaster: View Zero Buffer Warning
+            CheckAccountability: Check Accountability Agreement
+            CountdownTimer: 7-Second Friction Timer
+            ViewHours --> ViewDisaster
+            ViewDisaster --> CheckAccountability
+            CheckAccountability --> CountdownTimer
+        }
+
+        CountdownTimer --> DangerModeTriggered: Countdown Expires
+    }
+
+    DangerModeTriggered --> HomeTab: Danger Mode Active (Pulsing Red)
+    ProfileTab --> Onboarding: Click Logout Icon
+```
+
+---
+
+## 2. Logical Budget & Emergency Calculation Pipeline
+
+```mermaid
+flowchart TD
+    subgraph INCOME_CALC["1. Total Income Calculation"]
+        I1["Base Monthly Income (e.g. RM 3,200)"]
+        I2["Logged Extra Income (from Coach transactions)"]
+        I1 & I2 --> I_TOTAL["Total Active Income = Base + Extra Income"]
+    end
+
+    subgraph DEDUCTIONS["2. Mandatory Commitments"]
+        D1["Fixed Bills (Rent, Utilities, Food)"]
+        D2["Static BNPL Debt Stack (Grab, Shopee, Atome)"]
+        D3["Simulated Active BNPL Items"]
+        D2 & D3 --> BNPL_DUE["Total BNPL Due This Cycle"]
+        D4["Savings Target (Total Income * Savings %)"]
+    end
+
+    subgraph POOL_CALC["3. Daily Allowance Calculation"]
+        I_TOTAL --> POOL_EQ["Monthly Pool = Total Income - Fixed Bills - BNPL Due - Savings"]
+        D1 & BNPL_DUE & D4 --> POOL_EQ
+        POOL_EQ --> REM_POOL["Remaining Pool = Monthly Pool - Total Logged Expenses"]
+        REM_POOL --> DAILY_DIV["Daily Budget = Remaining Pool / Days Left in Cycle"]
+        DAILY_DIV --> TODAY_CMP{"Today's Spent vs Daily Budget"}
+        TODAY_CMP -->|"< 60%"| STATUS_GREEN["🟢 On Track (Green)"]
+        TODAY_CMP -->|"60% - 90%"| STATUS_AMBER["🟡 Tight (Amber)"]
+        TODAY_CMP -->|"> 90%"| STATUS_RED["🔴 Over Budget (Red)"]
+    end
+
+    subgraph EMERGENCY_ENGINE["4. Emergency Health Engine"]
+        I_TOTAL & D1 --> AVAIL["Available Income = Total Income - Fixed Bills"]
+        BNPL_DUE & AVAIL --> SHORTFALL["Shortfall = BNPL Due - Available Income"]
+        D1 --> BURN["Daily Burn Rate = Fixed Bills / 30"]
+        LIQUID["Liquid Cash Reserve (RM 1,240.50)"] & BURN --> SURVIVAL["Survival Score Days = Liquid Cash / Burn Rate"]
+        SHORTFALL & SURVIVAL --> CRISIS_CHECK{"Shortfall > 0 OR Survival Score < 30 Days?"}
+        CRISIS_CHECK -->|"YES"| TRIG_EMERG["🚨 Emergency Mode Triggered (Badge Active)"]
+        CRISIS_CHECK -->|"NO"| SAFE_EMERG["✅ Financial Vitals Stable"]
+    end
+
+    style I_TOTAL fill:#dcfce7,stroke:#16a34a,stroke-width:2px
+    style DAILY_DIV fill:#e0f2fe,stroke:#0284c7,stroke-width:2px
+    style TRIG_EMERG fill:#fee2e2,stroke:#dc2626,stroke-width:2px
+    style SAFE_EMERG fill:#dcfce7,stroke:#16a34a,stroke-width:2px
+```
+
+---
+
+## 3. BNPL Purchase Simulation Decision Engine
+
+```mermaid
+flowchart TD
+    INPUT["User Inputs:<br/>• Item Name<br/>• Total Price (RM)<br/>• Repayment Months (1-24)<br/>• Interest Rate (%)<br/>• Payment Provider"] --> VALIDATE{"Daily Pool >= RM 300?"}
+
+    VALIDATE -->|"NO (Pool Depleted)"| BLOCKED_UI["🔒 DailyPoolBlockedScreen<br/>• Hard Lock on Simulation<br/>• Detailed Deficit Breakdown<br/>• Action Plan to Unlock"]
+    
+    VALIDATE -->|"YES"| RUN_SIM["Compute Financial Impact:<br/>• monthlyPay = (amount / duration) * (1 + interest%)<br/>• bufferImpact = (monthlyPay / Liquid Cash) * 100<br/>• totalImpact = (amount / Liquid Cash) * 100"]
+
+    RUN_SIM --> ANIM["⏳ SimLoadingScreen<br/>• 3-Second Visual Analysis Pulse"]
+    ANIM --> DECISION{"totalImpact >= 50%?"}
+
+    DECISION -->|"NO (Safe < 50%)"| SAFE_UI["🟢 SimResultScreen (Safe)<br/>• Projected Liquidity Bar (Green)<br/>• Guardian Angel Safe Speech"]
+    DECISION -->|"YES (High Risk >= 50%)"| DANGER_UI["🟡 SimResultScreen (High Risk)<br/>• Projected Liquidity Bar (Red Impact)<br/>• Guardian Angel Warning Speech"]
+
+    SAFE_UI --> ACT_CONFIRM["Action: Confirm Purchase"]
+    ACT_CONFIRM --> SAVE_BNPL["Save to simulatedBnplItems[]<br/>Update Monthly Debt Stack"]
+    SAVE_BNPL --> RETURN_SAFE["Return to Home<br/>Toast: BNPL Added"]
+
+    DANGER_UI --> ACT_POSTPONE["Action: Postpone to Next Month"]
+    ACT_POSTPONE --> RETURN_POSTPONE["Return to Home<br/>Toast: Balance Protected"]
+
+    DANGER_UI --> ACT_PROCEED["Action: Continue to Buy"]
+    ACT_PROCEED --> PROCEED_SCREEN["🔥 ProceedAnywayScreen (Psychological Friction)"]
+
+    subgraph FRICTION_MODULE["Behavioral Friction Layers"]
+        direction TB
+        F_HOURS["Wage Slavery Converter:<br/>Math.round(amount / 15) Hours of Life"]
+        F_LIFESTYLE["Zero Buffer Alert:<br/>One Disaster Away From Crisis"]
+        F_CHECK["Accountability Checkbox:<br/>'I admit I have zero self-control...'"]
+        F_TIMER["Forced 7-Second Cooldown Timer"]
+        F_HOURS --> F_LIFESTYLE --> F_CHECK --> F_TIMER
+    end
+
+    PROCEED_SCREEN --> FRICTION_MODULE
+    FRICTION_MODULE --> CONFIRM_PROCEED["Click 'I Don't Care, Ruin My Finances'"]
+    CONFIRM_PROCEED --> ACTIVATE_DANGER["App.jsx: dangerMode = true<br/>Save Purchase to Stack<br/>Home Balance Enters Pulsing Red Alert"]
+
+    style BLOCKED_UI fill:#f3e8ff,stroke:#9333ea,stroke-width:2px
+    style SAFE_UI fill:#dcfce7,stroke:#16a34a,stroke-width:2px
+    style DANGER_UI fill:#fef3c7,stroke:#d97706,stroke-width:2px
+    style PROCEED_SCREEN fill:#450a0a,stroke:#dc2626,color:#fecaca,stroke-width:2px
+    style ACTIVATE_DANGER fill:#991b1b,stroke:#ef4444,color:#ffffff,stroke-width:3px
+```

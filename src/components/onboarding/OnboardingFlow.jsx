@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-function OnboardStep2({ onBack, onDone }) {
+function OnboardStep2({ onDone }) {
   const [name, setName] = useState("");
   const [activated, setActivated] = useState(false);
 
@@ -12,11 +12,8 @@ function OnboardStep2({ onBack, onDone }) {
 
   return (
     <div style={{ display: "flex", flexDirection: "column", flex: 1, width: "100%", height: "100%", overflow: "hidden", background: "#f6f7f8" }}>
-      <div style={{ display: "flex", alignItems: "center", padding: "24px 16px 8px", justifyContent: "space-between" }}>
-        <button onClick={onBack} style={{ width: 48, height: 48, borderRadius: "50%", border: "none", background: "transparent", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
-          <span className="material-symbols-outlined" style={{ fontSize: 24, color: "#111" }}>arrow_back</span>
-        </button>
-        <h2 style={{ fontSize: 18, fontWeight: 600, color: "#111", margin: 0, flex: 1, textAlign: "center", paddingRight: 48 }}>Identity</h2>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", padding: "24px 16px 8px" }}>
+        <h2 style={{ fontSize: 18, fontWeight: 600, color: "#111", margin: 0, textAlign: "center" }}>Identity</h2>
       </div>
 
       {/* Progress */}
@@ -94,7 +91,7 @@ function OnboardStep2({ onBack, onDone }) {
 export default function OnboardingFlow({ onComplete }) {
   return (
     <div style={{ display: "flex", flexDirection: "column", flex: 1, width: "100%", height: "100%", overflow: "hidden" }}>
-      <OnboardStep2 onBack={() => { }} onDone={(name) => onComplete("RM", name)} />
+      <OnboardStep2 onDone={(name) => onComplete("RM", name)} />
     </div>
   );
 }
