@@ -301,69 +301,92 @@ function ProceedAnywayScreen({ itemName, amount, duration, onDone }) {
     }}>
       {/* Header */}
       <div style={{ display: "flex", alignItems: "center", justifyContent: "center", padding: "52px 16px 8px", flexShrink: 0 }}>
-        <h2 style={{ fontSize: 17, fontWeight: 700, color: "#0F172A", margin: 0 }}>Proceed Anyway</h2>
+        <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+
+          <h2 style={{ fontSize: 20, fontWeight: 700, color: "#0F172A", margin: 0, letterSpacing: "0.02em", fontFamily: "Inter, sans-serif" }}>Financial Death Trap</h2>
+        </div>
       </div>
 
       {/* Scrollable body */}
       <div style={{ flex: 1, minHeight: 0, overflowY: "auto", padding: "0 16px 24px" }}>
 
-        <h1 style={{ fontSize: 32, fontWeight: 800, color: "#0F172A", margin: "24px 0 24px", letterSpacing: "-0.025em", lineHeight: 1.15 }}>
-          Choice Confirmed:<br />Financial Shackles On.
-        </h1>
+        <div style={{ margin: "24px 0 20px" }}>
 
-        {/* Work timer card */}
-        <div style={{
-          background: "#E2E8F0", borderRadius: 20, padding: "24px",
-          borderLeft: "4px solid #d41111", marginBottom: 16,
-          boxShadow: "0 1px 4px rgba(0,0,0,0.06)",
-        }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
-            <span className="material-symbols-outlined" style={{ fontSize: 20, color: "#d41111", fontVariationSettings: "'FILL' 1" }}>schedule</span>
-            <span style={{ fontSize: 12, fontWeight: 700, color: "#d41111", textTransform: "uppercase", letterSpacing: "0.1em" }}>Work Timer</span>
-          </div>
-          <p className="font-mono" style={{ fontSize: 32, fontWeight: 800, color: "#0F172A", margin: "0 0 10px", letterSpacing: "-0.02em" }}>{hoursOfWork} Hours</p>
-          <p style={{ fontSize: 14, color: "#475569", margin: 0, lineHeight: 1.6 }}>
-            You aren't buying a product; you are selling <strong>{hoursOfWork} hours</strong> of your life to a billionaire.
+          <h1 style={{ fontSize: 28, fontWeight: 900, color: "#0F172A", margin: "12px 0 8px", letterSpacing: "-0.03em", lineHeight: 1.15 }}>
+            You Are Actively Digging Your Own Financial Grave.
+          </h1>
+          <p style={{ fontSize: 14, color: "#475569", margin: 0, lineHeight: 1.5 }}>
+            This is not a flex. You are trading your future freedom, dignity, and sanity for a temporary dopamine rush.
           </p>
         </div>
 
-        {/* Lifestyle card */}
+        {/* Wage Slavery Card */}
         <div style={{
-          background: "#fff", borderRadius: 20, padding: "20px",
-          border: "1px solid #E2E8F0", boxShadow: "0 1px 4px rgba(0,0,0,0.04)", marginBottom: 24,
-          display: "flex", alignItems: "flex-start", gap: 16,
+          background: "#E2E8F0", borderRadius: 24, padding: "20px",
+          borderLeft: "4px solid #d41111", marginBottom: 16,
+          boxShadow: "0 1px 4px rgba(0,0,0,0.06)",
         }}>
-          <div style={{ width: 48, height: 48, borderRadius: "50%", background: "#F1F5F9", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-            <span className="material-symbols-outlined" style={{ fontSize: 24, color: "#64748B" }}>restaurant_menu</span>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+              <span className="material-symbols-outlined" style={{ fontSize: 20, color: "#EF4444", fontVariationSettings: "'FILL' 1" }}>lock_clock</span>
+              <span style={{ fontSize: 11, fontWeight: 800, color: "#EF4444", textTransform: "uppercase", letterSpacing: "0.08em" }}>Wage Slavery Cost</span>
+            </div>
+            <span style={{ fontSize: 11, fontWeight: 700, color: "#FCA5A5", padding: "2px 8px", borderRadius: 999 }}>
+              {duration} Months in Debt
+            </span>
+          </div>
+          <p className="font-mono" style={{ fontSize: 36, fontWeight: 900, color: "#d41111", margin: "0 0 8px", letterSpacing: "-0.03em" }}>
+            {hoursOfWork} Hours
+          </p>
+          <p style={{ fontSize: 13, color: "#475569", margin: 0, lineHeight: 1.6 }}>
+            You must spend <strong>{hoursOfWork} hours of exhausting labor</strong> just to pay off "{itemName}". You aren't buying freedom; you are renting an illusion while staying dead broke.
+          </p>
+        </div>
+
+        {/* Brutal Reality Check Card */}
+        <div style={{
+          background: "#fff", borderRadius: 24, padding: "18px 20px",
+          border: "1px solid #E2E8F0", marginBottom: 20,
+          display: "flex", alignItems: "flex-start", gap: 14,
+        }}>
+          <div style={{
+            width: 44, height: 44, borderRadius: "50%",
+            background: "#FEE2E2", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0
+          }}>
+            <span className="material-symbols-outlined" style={{ fontSize: 22, color: "#d41111" }}>skull</span>
           </div>
           <div>
-            <p style={{ fontSize: 15, fontWeight: 700, color: "#0F172A", margin: "0 0 4px" }}>Current Lifestyle: Instant Noodles Mode</p>
-            <p style={{ fontSize: 13, color: "#94A3B8", margin: 0 }}>Welcome to the struggle.</p>
+            <p style={{ fontSize: 14, fontWeight: 800, color: "#0F172A", margin: "0 0 4px" }}>
+              Zero Buffer: One Disaster Away From Crisis
+            </p>
+            <p style={{ fontSize: 12, color: "#94A3B8", margin: 0, lineHeight: 1.55 }}>
+              One medical bill, vehicle breakdown, or job delay will push you straight into borrowing more money. You are living on borrowed time.
+            </p>
           </div>
         </div>
 
-        {/* Shame checkbox */}
+        {/* Shame / Accountability checkbox */}
         <div
           onClick={() => !proceeded && setChecked(c => !c)}
           style={{
-            background: checked ? "rgba(212,17,17,0.08)" : "rgba(212,17,17,0.05)",
-            border: `1.5px solid ${checked ? "rgba(212,17,17,0.3)" : "rgba(212,17,17,0.15)"}`,
-            borderRadius: 20, padding: "16px", marginBottom: 32,
+            background: checked ? "rgba(239,68,68,0.12)" : "rgba(239,68,68,0.04)",
+            border: `1.5px solid ${checked ? "#EF4444" : "rgba(239,68,68,0.2)"}`,
+            borderRadius: 20, padding: "16px", marginBottom: 20,
             display: "flex", alignItems: "flex-start", gap: 12, cursor: proceeded ? "default" : "pointer",
-            transition: "background 0.2s, border-color 0.2s",
+            transition: "all 0.2s",
           }}
         >
           <div style={{
-            width: 20, height: 20, borderRadius: 12, flexShrink: 0, marginTop: 1,
-            border: `2px solid ${checked ? "#d41111" : "#CBD5E1"}`,
-            background: checked ? "#d41111" : "transparent",
+            width: 22, height: 22, borderRadius: 8, flexShrink: 0, marginTop: 1,
+            border: `2px solid ${checked ? "#EF4444" : "#64748B"}`,
+            background: checked ? "#EF4444" : "transparent",
             display: "flex", alignItems: "center", justifyContent: "center",
             transition: "all 0.2s",
           }}>
-            {checked && <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>}
+            {checked && <span className="material-symbols-outlined" style={{ color: "#fff", fontSize: 16, fontWeight: 900 }}>check</span>}
           </div>
-          <p style={{ fontSize: 14, color: "#334155", margin: 0, lineHeight: 1.55, fontWeight: 500 }}>
-            I admit I am being a slave to my impulses and I accept the stress this will cause me later.
+          <p style={{ fontSize: 13, color: checked ? "#141414ff" : "#CBD5E1", margin: 0, lineHeight: 1.5, fontWeight: 600 }}>
+            I admit I have zero self-control, I am voluntarily choosing debt over financial peace, and I accept full responsibility for being broke this month.
           </p>
         </div>
 
@@ -374,35 +397,38 @@ function ProceedAnywayScreen({ itemName, amount, duration, onDone }) {
             borderRadius: 20, border: "1px solid rgba(212,17,17,0.15)", marginBottom: 16,
             animation: "fadeSlideUp 0.3s ease both",
           }}>
-            <p style={{ fontSize: 13, color: "#d41111", fontWeight: 600, margin: 0 }}>
-              Returning to dashboard in <strong>{countdown}s</strong>… Your financial health is now in critical state.
+            <p style={{ fontSize: 13, color: "#FCA5A5", fontWeight: 700, margin: 0 }}>
+              Locking in financial ruin in <strong>{countdown}s</strong>… There is still time to cancel back out.
             </p>
           </div>
         )}
       </div>
 
-      {/* CTA */}
+      {/* CTA Bottom Bar */}
       <div style={{
         flexShrink: 0, padding: "12px 16px 32px",
         background: "rgba(248,246,246,0.95)", backdropFilter: "blur(12px)",
         borderTop: "1px solid #E2E8F0",
+        display: "flex", flexDirection: "column", gap: 10,
       }}>
         <button
           onClick={handleProceed}
           disabled={!checked || proceeded}
           style={{
             width: "100%", height: 56, borderRadius: 9999,
-            background: checked && !proceeded ? "#0F172A" : "#94A3B8",
+            background: checked && !proceeded ? "#d41111" : "#94A3B8",
             border: "none", cursor: checked && !proceeded ? "pointer" : "not-allowed",
-            color: "#fff", fontSize: 16, fontWeight: 700,
-            opacity: checked && !proceeded ? 1 : 0.6,
-            transition: "background 0.3s, opacity 0.3s",
+            color: "#fff", fontSize: 15, fontWeight: 800,
+            opacity: checked && !proceeded ? 1 : 0.5,
+            transition: "all 0.3s",
             display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+            boxShadow: checked && !proceeded ? "0 8px 24px rgba(212,17,17,0.3)" : "none",
+            letterSpacing: "-0.01em"
           }}
         >
           {proceeded
-            ? <><span className="material-symbols-outlined" style={{ fontSize: 18, animation: "spin 0.9s linear infinite" }}>autorenew</span> Redirecting in {countdown}s…</>
-            : "Proceed to Struggle"
+            ? <><span className="material-symbols-outlined" style={{ fontSize: 18, animation: "spin 0.9s linear infinite" }}>autorenew</span> Ruining Finances in {countdown}s…</>
+            : "I Don't Care, Ruin My Finances"
           }
         </button>
       </div>
@@ -564,7 +590,7 @@ function getProviderIcon(label = "") {
   return "payments";
 }
 
-export default function Simulation({ onBack, onPostpone, onProceed, currency, onScreenChange, monthlyIncome = 3200, fixedBills = [], bnplDueThisCycle = 0, savingsTarget = 10, onConfirmPurchase = () => {} }) {
+export default function Simulation({ onBack, onPostpone, onProceed, currency, onScreenChange, monthlyIncome = 3200, fixedBills = [], bnplDueThisCycle = 0, savingsTarget = 10, onConfirmPurchase = () => { } }) {
   const [itemName, setItemName] = useState("MacBook Air M2");
   const [amount, setAmount] = useState(1200);
   const [amountDisplay, setAmountDisplay] = useState("1,200.00");
