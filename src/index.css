@@ -10,6 +10,22 @@
   --shell-padding-x: 16px;
   --shell-status-pt: 48px;
   --shell-bottom-pb: 112px;
+
+  /* Shneiderman Consistency: Unified Color Tokens */
+  --color-brand-primary: #13ecc8;
+  --color-brand-accent: #22c55e;
+  --color-brand-glow: rgba(19, 236, 200, 0.2);
+  --color-state-safe: #22c55e;
+  --color-state-warning: #f59e0b;
+  --color-state-danger: #ef4444;
+  --color-bg-base: #f6f8f5;
+  --color-surface-card: #ffffff;
+  --color-text-title: #0f172a;
+  --color-text-body: #475569;
+  --color-text-muted: #94a3b8;
+  --radius-card: 24px;
+  --radius-button: 9999px;
+  --radius-chip: 12px;
 }
 
 /* Automatically map JetBrains Mono to all numbers (0-9) and currency/math symbols globally */
@@ -41,4 +57,36 @@ body {
 .font-mono {
   font-family: 'JetBrains Mono', monospace !important;
   font-variant-numeric: tabular-nums;
+}
+
+/* Informative Feedback Animations */
+@keyframes toastSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes safe-pulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.15); opacity: 0.75; }
+}
+
+@keyframes fadeSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.toast-animate {
+  animation: toastSlideIn 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }

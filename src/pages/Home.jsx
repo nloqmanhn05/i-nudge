@@ -4,6 +4,7 @@ import { DEBT_STACK } from "../data/mockData";
 
 export default function Home({
   dangerMode,
+  onExitDangerMode,
   activeCurrency,
   remainingToday,
   coachStatusColor,
@@ -34,24 +35,47 @@ export default function Home({
         {/* ── Balance Hero ── */}
         <div id="liquidity-card" style={{
           display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center",
-          padding: "20px 0 24px",
+          padding: "20px 16px 24px",
           background: dangerMode
             ? "linear-gradient(155deg, #fecaca 0%, #fee2e2 60%, #fff5f5 100%)"
             : "linear-gradient(155deg, #cdfaf3 0%, #e2f9f5 60%, #edfcf9 100%)",
           borderRadius: 28, marginBottom: 20,
           transition: "background 1s ease",
+          position: "relative"
         }}>
           {dangerMode && (
             <div style={{
-              display: "inline-flex", alignItems: "center", gap: 6,
-              padding: "4px 14px", borderRadius: 999, marginBottom: 10,
-              background: "rgba(212,17,17,0.1)", border: "1px solid rgba(212,17,17,0.2)",
+              display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%",
+              marginBottom: 10,
             }}>
-              <span style={{
-                width: 8, height: 8, borderRadius: "50%", background: "#d41111",
-                display: "inline-block", animation: "safe-pulse 1s ease-in-out infinite",
-              }} />
-              <span style={{ fontSize: 11, fontWeight: 800, color: "#d41111", letterSpacing: "0.1em", textTransform: "uppercase" }}>Critical Low</span>
+              <div style={{
+                display: "inline-flex", alignItems: "center", gap: 6,
+                padding: "4px 12px", borderRadius: 999,
+                background: "rgba(212,17,17,0.1)", border: "1px solid rgba(212,17,17,0.2)",
+              }}>
+                <span style={{
+                  width: 8, height: 8, borderRadius: "50%", background: "#d41111",
+                  display: "inline-block", animation: "safe-pulse 1s ease-in-out infinite",
+                }} />
+                <span style={{ fontSize: 11, fontWeight: 800, color: "#d41111", letterSpacing: "0.1em", textTransform: "uppercase" }}>Critical Low</span>
+              </div>
+
+              {/* Shneiderman Rule 6: Easy Reversal of Actions */}
+              {onExitDangerMode && (
+                <button
+                  onClick={onExitDangerMode}
+                  style={{
+                    display: "inline-flex", alignItems: "center", gap: 4,
+                    background: "rgba(255,255,255,0.85)", border: "1px solid rgba(212,17,17,0.2)",
+                    borderRadius: 999, padding: "4px 10px", fontSize: 11, fontWeight: 700,
+                    color: "#7f1d1d", cursor: "pointer", boxShadow: "0 2px 6px rgba(0,0,0,0.05)"
+                  }}
+                  title="Revert simulation state"
+                >
+                  <span className="material-symbols-outlined" style={{ fontSize: 14 }}>replay</span>
+                  <span>Exit Test</span>
+                </button>
+              )}
             </div>
           )}
           <p className="font-google-text" style={{ color: dangerMode ? "rgba(150,20,20,0.6)" : "rgba(15,60,54,0.55)", fontSize: 16, fontWeight: 500, marginBottom: 4, marginTop: 0, letterSpacing: "0.01em", transition: "color 1s" }}>

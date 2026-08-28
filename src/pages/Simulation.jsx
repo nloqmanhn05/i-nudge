@@ -22,17 +22,17 @@ function SimLoadingScreen({ progress }) {
         <div style={{ position: "relative", display: "flex", alignItems: "center", justifyContent: "center" }}>
           <div style={{
             position: "absolute", width: 220, height: 220, borderRadius: "50%",
-            background: "rgba(89,244,37,0.18)", filter: "blur(40px)",
+            background: "rgba(19,236,200,0.18)", filter: "blur(40px)",
           }} />
           {/* Circle card */}
           <div style={{
             width: 192, height: 192, borderRadius: "50%",
-            background: "#fff", boxShadow: "0 0 40px 20px rgba(89,244,37,0.15), 0 8px 40px rgba(0,0,0,0.10)",
+            background: "#fff", boxShadow: "0 0 40px 20px rgba(19,236,200,0.15), 0 8px 40px rgba(0,0,0,0.10)",
             border: "1px solid #f1f5f0",
             display: "flex", alignItems: "center", justifyContent: "center",
             position: "relative",
           }}>
-            <svg width="128" height="64" viewBox="0 0 100 50" fill="none" stroke="#59f425" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+            <svg width="128" height="64" viewBox="0 0 100 50" fill="none" stroke="#13ecc8" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
               <path opacity="0.5" d="M0 25 L20 25 L30 10 L40 40 L50 25 L60 25 L70 5 L80 45 L90 25 L100 25" />
               <path d="M0 25 L20 25 L30 10 L40 40 L50 25">
                 <animate attributeName="stroke-dasharray" from="0,200" to="200,0" dur="1.5s" repeatCount="indefinite" />
@@ -46,7 +46,7 @@ function SimLoadingScreen({ progress }) {
               border: "1px solid #f1f5f1",
               display: "flex", alignItems: "center", justifyContent: "center",
             }}>
-              <span className="material-symbols-outlined" style={{ fontSize: 22, color: "#59f425", fontVariationSettings: "'FILL' 1" }}>health_and_safety</span>
+              <span className="material-symbols-outlined" style={{ fontSize: 22, color: "#13ecc8", fontVariationSettings: "'FILL' 1" }}>health_and_safety</span>
             </div>
           </div>
         </div>
@@ -65,7 +65,7 @@ function SimLoadingScreen({ progress }) {
         <div style={{ width: 192, height: 6, background: "#E2E8F0", borderRadius: 999, overflow: "hidden" }}>
           <div style={{
             height: "100%", borderRadius: 999,
-            background: "#59f425",
+            background: "var(--color-brand-primary, #13ecc8)",
             width: `${progress}%`,
             transition: "width 0.3s ease",
           }} />
@@ -775,6 +775,7 @@ export default function Simulation({ onBack, onPostpone, onProceed, currency, on
             <input
               value={itemName}
               onChange={e => setItemName(e.target.value)}
+              onKeyDown={e => { if (e.key === "Enter" && itemName.trim()) handleAnalyze(); }}
               placeholder="e.g. MacBook Air M2"
               style={{
                 width: "100%", height: 56, background: "#F8FAFC",
@@ -783,7 +784,7 @@ export default function Simulation({ onBack, onPostpone, onProceed, currency, on
                 outline: "none", fontFamily: "inherit", boxSizing: "border-box",
                 transition: "box-shadow 0.2s",
               }}
-              onFocus={e => e.target.style.boxShadow = "0 0 0 2px rgba(31,249,31,0.5)"}
+              onFocus={e => e.target.style.boxShadow = "0 0 0 2px rgba(19,236,200,0.5)"}
               onBlur={e => e.target.style.boxShadow = "none"}
             />
           </div>
@@ -1166,12 +1167,13 @@ export default function Simulation({ onBack, onPostpone, onProceed, currency, on
                 value={amountDisplay}
                 onFocus={handleAmountFocus}
                 onChange={handleAmountChange}
+                onKeyDown={e => { if (e.key === "Enter" && itemName.trim()) handleAnalyze(); }}
                 onBlur={handleAmountBlur}
                 style={{
                   background: "transparent", border: "none", outline: "none",
                   fontSize: 36, fontWeight: 700, color: "#fff",
                   width: 180, textAlign: "center",
-                  letterSpacing: "-0.02em", caretColor: "#1ff91f",
+                  letterSpacing: "-0.02em", caretColor: "#13ecc8",
                 }}
               />
             </div>
@@ -1186,16 +1188,17 @@ export default function Simulation({ onBack, onPostpone, onProceed, currency, on
                 <input
                   type="text" inputMode="numeric" value={durationRaw}
                   onChange={e => { const raw = e.target.value.replace(/[^0-9]/g, ""); setDurationRaw(raw); const v = parseInt(raw, 10); if (!isNaN(v) && v > 0 && v <= 60) setDuration(v); }}
+                  onKeyDown={e => { if (e.key === "Enter" && itemName.trim()) handleAnalyze(); }}
                   onFocus={e => e.target.select()}
                   onBlur={() => { if (!durationRaw || parseInt(durationRaw) < 1) { setDurationRaw("1"); setDuration(1); } }}
-                  style={{ width: 36, background: "transparent", border: "none", outline: "none", fontSize: 16, fontWeight: 700, color: "#0F172A", textAlign: "center", fontFamily: "'JetBrains Mono', monospace", caretColor: "#1ff91f" }}
+                  style={{ width: 36, background: "transparent", border: "none", outline: "none", fontSize: 16, fontWeight: 700, color: "#0F172A", textAlign: "center", fontFamily: "'JetBrains Mono', monospace", caretColor: "#13ecc8" }}
                 />
                 <span style={{ fontSize: 11, fontWeight: 600, color: "#64748B" }}>mo</span>
               </div>
             </div>
 
             {/* Monthly Pay */}
-            <div style={{ background: "#F8FAFC", borderRadius: 20, padding: "14px 8px", textAlign: "center", borderBottom: "2px solid rgba(31,249,31,0.5)" }}>
+            <div style={{ background: "#F8FAFC", borderRadius: 20, padding: "14px 8px", textAlign: "center", borderBottom: "2px solid rgba(19,236,200,0.5)" }}>
               <span style={{ fontSize: 9, fontWeight: 700, color: "#94A3B8", textTransform: "uppercase", letterSpacing: "0.08em", display: "block", marginBottom: 6 }}>Monthly Pay</span>
               <span className="font-mono" style={{ fontSize: 13, fontWeight: 700, color: "#0F172A" }}>{`${currency} ${fmt(monthlyPay)}`}</span>
             </div>
@@ -1207,9 +1210,10 @@ export default function Simulation({ onBack, onPostpone, onProceed, currency, on
                 <input
                   type="text" inputMode="decimal" value={interestRaw}
                   onChange={e => { const raw = e.target.value.replace(/[^0-9.]/g, ""); setInterestRaw(raw); const v = parseFloat(raw); if (!isNaN(v) && v >= 0 && v <= 100) setInterest(v); }}
+                  onKeyDown={e => { if (e.key === "Enter" && itemName.trim()) handleAnalyze(); }}
                   onFocus={e => e.target.select()}
                   onBlur={() => { if (interestRaw === "" || isNaN(parseFloat(interestRaw))) { setInterestRaw("0"); setInterest(0); } }}
-                  style={{ width: 36, background: "transparent", border: "none", outline: "none", fontSize: 16, fontWeight: 700, color: "#0F172A", textAlign: "center", fontFamily: "'JetBrains Mono', monospace", caretColor: "#1ff91f" }}
+                  style={{ width: 36, background: "transparent", border: "none", outline: "none", fontSize: 16, fontWeight: 700, color: "#0F172A", textAlign: "center", fontFamily: "'JetBrains Mono', monospace", caretColor: "#13ecc8" }}
                 />
                 <span style={{ fontSize: 11, fontWeight: 600, color: "#64748B" }}>%</span>
               </div>
@@ -1303,24 +1307,24 @@ export default function Simulation({ onBack, onPostpone, onProceed, currency, on
             disabled={!itemName.trim()}
             style={{
               width: "100%", height: 56, borderRadius: 9999,
-              background: isDailyPoolBlocked ? "rgba(192,132,252,0.15)" : "#1ff91f",
+              background: isDailyPoolBlocked ? "rgba(192,132,252,0.15)" : !itemName.trim() ? "#E2E8F0" : "#13ecc8",
               border: isDailyPoolBlocked ? "2px solid rgba(192,132,252,0.4)" : "none",
               cursor: itemName.trim() ? "pointer" : "not-allowed",
-              color: isDailyPoolBlocked ? "#c084fc" : "#0a2a0a",
+              color: isDailyPoolBlocked ? "#c084fc" : !itemName.trim() ? "#94A3B8" : "#0f3c36",
               fontSize: 16, fontWeight: 700,
               display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
-              boxShadow: isDailyPoolBlocked ? "0 4px 20px rgba(192,132,252,0.2)" : "0 8px 20px rgba(31,249,31,0.25)",
-              transition: "transform 0.15s, background 0.3s",
+              boxShadow: isDailyPoolBlocked ? "0 4px 20px rgba(192,132,252,0.2)" : !itemName.trim() ? "none" : "0 8px 24px rgba(19,236,200,0.35)",
+              transition: "transform 0.15s, background 0.3s, box-shadow 0.3s",
               letterSpacing: "-0.01em", fontFamily: "inherit",
             }}
-            onMouseEnter={e => { e.currentTarget.style.transform = "scale(1.02)"; }}
+            onMouseEnter={e => { if (itemName.trim()) e.currentTarget.style.transform = "scale(1.02)"; }}
             onMouseLeave={e => { e.currentTarget.style.transform = "scale(1)"; }}
-            onMouseDown={e => { e.currentTarget.style.transform = "scale(0.98)"; }}
+            onMouseDown={e => { if (itemName.trim()) e.currentTarget.style.transform = "scale(0.98)"; }}
             onMouseUp={e => { e.currentTarget.style.transform = "scale(1)"; }}
           >
             {isDailyPoolBlocked
               ? <><span className="material-symbols-outlined" style={{ fontSize: 20, fontVariationSettings: "'FILL' 1" }}>lock</span><span>See Why Blocked</span></>
-              : <span>Analyse</span>
+              : <span>Analyse (Enter)</span>
             }
           </button>
         </div>

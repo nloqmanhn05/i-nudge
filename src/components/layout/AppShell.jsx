@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import BottomNav from "./BottomNav";
 import TourCard from "../ui/TourCard";
 
@@ -16,7 +17,35 @@ export default function AppShell({
     onTourNext,
     onTourDone,
     onTourClose,
+    toast,
+    onUndo,
 }) {
+    // Shneiderman Rule 2: Shortcuts (Keyboard Navigation) & Rule 7: Internal Locus of Control
+    useEffect(() => {
+        const handleKeyDown = (e) => {
+            // Ignore shortcut keys when typing inside input or textarea
+            const targetTag = e.target.tagName?.toLowerCase();
+            if (targetTag === "input" || targetTag === "textarea" || targetTag === "select") {
+                return;
+            }
+
+            if (e.key === "Escape") {
+                if (tourActive) {
+                    onTourClose?.();
+                }
+            } else if (onboarded && !tourActive) {
+                if (e.key === "1") onTabChange("home");
+                else if (e.key === "2") onTabChange("coach");
+                else if (e.key === "3") onTabChange("simulation");
+                else if (e.key === "4") onTabChange("emergency");
+                else if (e.key === "5") onTabChange("profile");
+            }
+        };
+
+        window.addEventListener("keydown", handleKeyDown);
+        return () => window.removeEventListener("keydown", handleKeyDown);
+    }, [onboarded, tourActive, onTabChange, onTourClose]);
+
     return (
         <>
             <style>{`
@@ -114,6 +143,66 @@ export default function AppShell({
                         {/* Page Content Slot */}
                         {children}
 
+                        {/* Shneiderman Rule 3 (Informative Feedback) & Rule 6 (Easy Reversal / Undo) Toast Banner */}
+                        {toast && (
+                            <div
+                                className="toast-animate"
+                                style={{
+                                    position: "absolute",
+                                    bottom: hideBottomNav ? 24 : 96,
+                                    left: 16,
+                                    right: 16,
+                                    zIndex: 9990,
+                                    background: "#0F172A",
+                                    color: "#F8FAFC",
+                                    padding: "12px 16px",
+                                    borderRadius: 16,
+                                    boxShadow: "0 10px 25px -5px rgba(0,0,0,0.3)",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "space-between",
+                                    gap: 12,
+                                }}
+                            >
+                                <div style={{ display: "flex", alignItems: "center", gap: 8, flex: 1, minWidth: 0 }}>
+                                    <span
+                                        className="material-symbols-outlined"
+                                        style={{
+                                            fontSize: 20,
+                                            color: toast.type === "danger" ? "#EF4444" : toast.type === "warning" ? "#F59E0B" : "#13ecc8",
+                                            fontVariationSettings: "'FILL' 1",
+                                            flexShrink: 0
+                                        }}
+                                    >
+                                        {toast.type === "danger" ? "error" : toast.type === "warning" ? "warning" : "check_circle"}
+                                    </span>
+                                    <span style={{ fontSize: 13, fontWeight: 500, lineHeight: 1.4, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                                        {toast.message}
+                                    </span>
+                                </div>
+                                {toast.canUndo && onUndo && (
+                                    <button
+                                        onClick={onUndo}
+                                        style={{
+                                            background: "rgba(255,255,255,0.15)",
+                                            border: "none",
+                                            color: "#13ecc8",
+                                            padding: "4px 10px",
+                                            borderRadius: 8,
+                                            fontSize: 12,
+                                            fontWeight: 700,
+                                            cursor: "pointer",
+                                            flexShrink: 0,
+                                            textTransform: "uppercase",
+                                            letterSpacing: "0.05em",
+                                        }}
+                                    >
+                                        Undo
+                                    </button>
+                                )}
+                            </div>
+                        )}
+
                         {/* Bottom Nav — hidden during focused, modal-style sub-flows
                 (e.g. Simulation's loading/result/proceed screens) so it
                 doesn't overlap a page's own bottom CTA bar. */}
@@ -123,22 +212,6 @@ export default function AppShell({
                                 onTabChange={onTabChange}
                                 showEmergencyBadge={showEmergencyBadge}
                                 disabled={tourActive && tourMandatory}
-                            />
-                        )}
-
-                        {/* Tour Click-Blocker — blocks ALL page interactions during the tour */}
-                        {tourActive && (
-                            <div
-                                style={{
-                                    position: "absolute",
-                                    inset: 0,
-                                    zIndex: 9997,
-                                    background: "transparent",
-                                    cursor: "not-allowed",
-                                }}
-                                onClick={e => e.stopPropagation()}
-                                onMouseDown={e => e.stopPropagation()}
-                                onPointerDown={e => e.stopPropagation()}
                             />
                         )}
 

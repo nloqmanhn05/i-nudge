@@ -78,21 +78,49 @@ export default function App() {
   // Simulation BNPL tracker — purchases confirmed in Simulation Page
   const [simulatedBnplItems, setSimulatedBnplItems] = useState([]);
 
+  // Toast / Feedback State (Shneiderman Rule 3: Feedback & Rule 6: Undo)
+  const [toast, setToast] = useState(null);
+  const undoActionRef = useRef(null);
+  const toastTimeoutRef = useRef(null);
+
+  const showToast = (message, type = "success", canUndo = false, undoAction = null) => {
+    if (toastTimeoutRef.current) clearTimeout(toastTimeoutRef.current);
+    undoActionRef.current = undoAction;
+    setToast({ message, type, canUndo });
+    toastTimeoutRef.current = setTimeout(() => {
+      setToast(null);
+      undoActionRef.current = null;
+    }, 4500);
+  };
+
+  const handleUndo = () => {
+    if (undoActionRef.current) {
+      undoActionRef.current();
+      showToast("Action undone successfully", "success", false, null);
+    }
+  };
+
   const handleProceed = () => {
     setDangerMode(true);
     setActiveTab("home");
+    showToast("High-risk purchase recorded. Danger mode active.", "warning");
+  };
+
+  const handleExitDangerMode = () => {
+    setDangerMode(false);
+    showToast("Danger mode deactivated. Returned to safe balance.", "success");
   };
 
   const handlePostpone = () => {
     setActiveTab("home");
+    showToast("Purchase postponed. Your balance remains protected.", "success");
   };
 
   // Called when user confirms a BNPL purchase in Simulation
   const handleConfirmPurchase = ({ name, amount: purchaseAmt, monthlyPay, provider, duration }) => {
-    setSimulatedBnplItems(prev => [
-      ...prev,
-      { id: Date.now(), name, amount: purchaseAmt, monthlyPay, provider, duration, date: new Date().toISOString() }
-    ]);
+    const newItem = { id: Date.now(), name, amount: purchaseAmt, monthlyPay, provider, duration, date: new Date().toISOString() };
+    setSimulatedBnplItems(prev => [...prev, newItem]);
+    showToast(`Added ${name} (${activeCurrency} ${monthlyPay}/mo) to BNPL tracking.`, "success");
     setActiveTab("home");
   };
 
@@ -100,6 +128,7 @@ export default function App() {
   const handleConfirmPurchaseHighRisk = (details) => {
     if (details) handleConfirmPurchase(details);
     setDangerMode(true);
+    showToast("High impact purchase added. Danger mode activated.", "danger");
     setActiveTab("home");
   };
 
@@ -179,11 +208,13 @@ export default function App() {
   const coachProps = {
     currency: activeCurrency,
     monthlyIncome: totalIncome, // Pass total income to Coach for consistent UI display
-    fixedBills, savingsTarget,
+    fixedBills, setFixedBills, savingsTarget,
     loggedSpending, onLogSpending: (s) => setLoggedSpending(prev => [s, ...prev]),
+    setLoggedSpending,
     cycleStartDay, dailyBudget, remainingToday, pctToday,
     coachStatusColor, coachStatusText, bnplDueThisCycle, daysLeft, fmt,
     simulatedBnplItems, // tracked simulation purchases for BudgetCoach breakdown
+    showToast,
   };
 
   // Spending % based on total available income
@@ -270,6 +301,7 @@ export default function App() {
         return (
           <Home
             dangerMode={dangerMode}
+            onExitDangerMode={handleExitDangerMode}
             activeCurrency={activeCurrency}
             remainingToday={remainingToday}
             coachStatusColor={coachStatusColor}
@@ -297,6 +329,8 @@ export default function App() {
       onTourNext={handleTourNext}
       onTourDone={handleTourDone}
       onTourClose={handleTourClose}
+      toast={toast}
+      onUndo={handleUndo}
     >
       {renderContent()}
     </AppShell>

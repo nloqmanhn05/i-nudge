@@ -2,10 +2,11 @@ import { useState } from "react";
 
 export default function BudgetCoach({
   onBack, currency, monthlyIncome, fixedBills, savingsTarget,
-  loggedSpending, onLogSpending, cycleStartDay,
+  loggedSpending, onLogSpending, setLoggedSpending, cycleStartDay,
   dailyBudget, remainingToday, pctToday, coachStatusColor, coachStatusText,
   bnplDueThisCycle, daysLeft, fmt, isTab,
   simulatedBnplItems = [],
+  showToast,
 }) {
   const [newLogAmount, setNewLogAmount] = useState("");
   const [newLogLabel, setNewLogLabel] = useState("");
@@ -30,33 +31,49 @@ export default function BudgetCoach({
   const handleAddLog = () => {
     const amt = parseFloat(newLogAmount);
     if (!newLogLabel.trim() || isNaN(amt) || amt <= 0) return;
-    onLogSpending({
+    const newEntry = {
       id: Date.now(),
       label: newLogLabel.trim(),
       amount: amt,           // Always positive
       type: "expense",       // Explicit transaction type
       category: newLogCategory,
       date: new Date().toISOString()
-    });
+    };
+    onLogSpending(newEntry);
     setNewLogLabel("");
     setNewLogAmount("");
     setShowLogForm(false);
+    showToast?.(`Logged ${newEntry.label} (${currency} ${fmt ? fmt(amt) : amt})`, "success");
+  };
+
+  const handleDeleteLog = (logToDelete) => {
+    if (setLoggedSpending) {
+      setLoggedSpending(prev => prev.filter(l => l.id !== logToDelete.id));
+      showToast?.(
+        `Deleted ${logToDelete.label} (${currency} ${fmt ? fmt(logToDelete.amount) : logToDelete.amount})`,
+        "warning",
+        true,
+        () => setLoggedSpending(prev => [logToDelete, ...prev])
+      );
+    }
   };
 
   const handleAddIncome = () => {
     const amt = parseFloat(incomeAmount);
     if (!incomeLabel.trim() || isNaN(amt) || amt <= 0) return;
-    onLogSpending({
+    const newEntry = {
       id: Date.now(),
       label: incomeLabel.trim(),
       amount: amt,           // Always positive!
       type: "income",        // Explicit transaction type
       category: "Income",
       date: new Date().toISOString()
-    });
+    };
+    onLogSpending(newEntry);
     setIncomeLabel("");
     setIncomeAmount("");
     setShowIncomeForm(false);
+    showToast?.(`Added ${newEntry.label} (+${currency} ${fmt ? fmt(amt) : amt}) to income`, "success");
   };
 
   const fixedTotal = fixedBills ? fixedBills.reduce((s, b) => s + b.amount, 0) : 0;
@@ -238,18 +255,32 @@ export default function BudgetCoach({
         {showLogForm && (
           <div style={{ background: "white", borderRadius: 28, padding: 20, boxShadow: "0 4px 20px rgba(0,0,0,0.08)", marginBottom: 16, animation: "fadeSlideUp 0.25s ease both" }}>
             <p style={{ fontSize: 14, fontWeight: 700, color: "#0F172A", margin: "0 0 12px" }}>Log a Purchase</p>
-            <input value={newLogLabel} onChange={e => setNewLogLabel(e.target.value)} placeholder="What did you buy?"
-              style={{ width: "100%", height: 44, border: "1.5px solid #E2E8F0", borderRadius: 18, padding: "0 14px", fontSize: 14, outline: "none", fontFamily: "inherit", color: "#0F172A", background: "#F8FAFC", marginBottom: 10, boxSizing: "border-box" }} />
+            <input
+              value={newLogLabel}
+              onChange={e => setNewLogLabel(e.target.value)}
+              onKeyDown={e => { if (e.key === "Enter") handleAddLog(); }}
+              placeholder="What did you buy?"
+              style={{ width: "100%", height: 44, border: "1.5px solid #E2E8F0", borderRadius: 18, padding: "0 14px", fontSize: 14, outline: "none", fontFamily: "inherit", color: "#0F172A", background: "#F8FAFC", marginBottom: 10, boxSizing: "border-box" }}
+            />
             <div style={{ display: "flex", gap: 10, marginBottom: 12 }}>
-              <input value={newLogAmount} onChange={e => setNewLogAmount(e.target.value)} placeholder="Amount" type="number"
-                style={{ flex: 1, height: 44, border: "1.5px solid #E2E8F0", borderRadius: 18, padding: "0 14px", fontSize: 14, outline: "none", fontFamily: "inherit", color: "#0F172A", background: "#F8FAFC", boxSizing: "border-box" }} />
-              <select value={newLogCategory} onChange={e => setNewLogCategory(e.target.value)}
-                style={{ flex: 1, height: 44, border: "1.5px solid #E2E8F0", borderRadius: 18, padding: "0 14px", fontSize: 14, outline: "none", fontFamily: "inherit", color: "#0F172A", background: "#F8FAFC", boxSizing: "border-box" }}>
+              <input
+                value={newLogAmount}
+                onChange={e => setNewLogAmount(e.target.value)}
+                onKeyDown={e => { if (e.key === "Enter") handleAddLog(); }}
+                placeholder="Amount"
+                type="number"
+                style={{ flex: 1, height: 44, border: "1.5px solid #E2E8F0", borderRadius: 18, padding: "0 14px", fontSize: 14, outline: "none", fontFamily: "inherit", color: "#0F172A", background: "#F8FAFC", boxSizing: "border-box" }}
+              />
+              <select
+                value={newLogCategory}
+                onChange={e => setNewLogCategory(e.target.value)}
+                style={{ flex: 1, height: 44, border: "1.5px solid #E2E8F0", borderRadius: 18, padding: "0 14px", fontSize: 14, outline: "none", fontFamily: "inherit", color: "#0F172A", background: "#F8FAFC", boxSizing: "border-box" }}
+              >
                 {CAT_OPTIONS.map(c => <option key={c.id} value={c.id}>{c.id}</option>)}
               </select>
             </div>
             <button onClick={handleAddLog} style={{ width: "100%", height: 44, background: "#0F172A", color: "white", border: "none", borderRadius: 18, fontSize: 14, fontWeight: 700, cursor: "pointer" }}>
-              Save & Recalculate
+              Save & Recalculate (Enter)
             </button>
           </div>
         )}
@@ -264,7 +295,7 @@ export default function BudgetCoach({
             {todayLogs.map(log => {
               const isIncome = log.type === "income" || log.category === "Income";
               return (
-                <div key={log.id} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "white", padding: "16px", borderRadius: 24, boxShadow: "0 2px 8px rgba(0,0,0,0.02)" }}>
+                <div key={log.id} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "white", padding: "14px 16px", borderRadius: 24, boxShadow: "0 2px 8px rgba(0,0,0,0.02)" }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
                     <div style={{ width: 40, height: 40, borderRadius: "50%", background: `${getCatColor(log.category)}22`, display: "flex", alignItems: "center", justifyContent: "center" }}>
                       <span className="material-symbols-outlined" style={{ fontSize: 20, color: getCatColor(log.category), fontVariationSettings: "'FILL' 1" }}>{getCatIcon(log.category)}</span>
@@ -274,9 +305,18 @@ export default function BudgetCoach({
                       <p style={{ margin: 0, fontSize: 12, color: "#94A3B8" }}>{log.category}</p>
                     </div>
                   </div>
-                  <span className="font-mono" style={{ fontSize: 15, fontWeight: 700, color: isIncome ? "#22C55E" : "#0F172A" }}>
-                    {isIncome ? "+" : "-"}{currency} {fmt ? fmt(Math.abs(log.amount)) : Math.abs(log.amount)}
-                  </span>
+                  <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                    <span className="font-mono" style={{ fontSize: 15, fontWeight: 700, color: isIncome ? "#22C55E" : "#0F172A" }}>
+                      {isIncome ? "+" : "-"}{currency} {fmt ? fmt(Math.abs(log.amount)) : Math.abs(log.amount)}
+                    </span>
+                    <button
+                      onClick={() => handleDeleteLog(log)}
+                      title="Delete log"
+                      style={{ background: "transparent", border: "none", color: "#94A3B8", cursor: "pointer", padding: "4px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center" }}
+                    >
+                      <span className="material-symbols-outlined" style={{ fontSize: 18 }}>delete</span>
+                    </button>
+                  </div>
                 </div>
               );
             })}
@@ -344,6 +384,7 @@ export default function BudgetCoach({
             <input
               value={incomeLabel}
               onChange={e => setIncomeLabel(e.target.value)}
+              onKeyDown={e => { if (e.key === "Enter") handleAddIncome(); }}
               placeholder="e.g. Salary, Freelance..."
               style={{
                 width: "100%", height: 48, border: "1.5px solid #E2E8F0",
@@ -352,13 +393,14 @@ export default function BudgetCoach({
                 background: "#F8FAFC", marginBottom: 14, boxSizing: "border-box",
                 transition: "border-color 0.2s"
               }}
-              onFocus={e => e.target.style.borderColor = "#59f425"}
+              onFocus={e => e.target.style.borderColor = "var(--color-brand-accent, #22c55e)"}
               onBlur={e => e.target.style.borderColor = "#E2E8F0"}
             />
             <p style={{ margin: "0 0 6px", fontSize: 12, fontWeight: 600, color: "#64748B", textTransform: "uppercase", letterSpacing: "0.05em" }}>Amount</p>
             <input
               value={incomeAmount}
               onChange={e => setIncomeAmount(e.target.value)}
+              onKeyDown={e => { if (e.key === "Enter") handleAddIncome(); }}
               placeholder="0.00"
               type="number"
               style={{
@@ -368,21 +410,21 @@ export default function BudgetCoach({
                 background: "#F8FAFC", marginBottom: 20, boxSizing: "border-box",
                 transition: "border-color 0.2s"
               }}
-              onFocus={e => e.target.style.borderColor = "#59f425"}
+              onFocus={e => e.target.style.borderColor = "var(--color-brand-accent, #22c55e)"}
               onBlur={e => e.target.style.borderColor = "#E2E8F0"}
             />
             <button
               onClick={handleAddIncome}
               style={{
                 width: "100%", height: 50,
-                background: "linear-gradient(135deg, #59f425 0%, #3dd117 100%)",
+                background: "linear-gradient(135deg, #13ecc8 0%, #22c55e 100%)",
                 color: "#0a2200", border: "none", borderRadius: 18,
                 fontSize: 15, fontWeight: 800, cursor: "pointer",
-                boxShadow: "0 6px 20px rgba(89,244,37,0.45)",
+                boxShadow: "0 6px 20px rgba(19,236,200,0.35)",
                 letterSpacing: "-0.01em"
               }}
             >
-              Save Income
+              Save Income (Enter)
             </button>
           </div>
         </div>

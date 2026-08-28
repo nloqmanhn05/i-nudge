@@ -77,34 +77,53 @@ export default function TourCard({ mandatory, pageIndex, elemIndex, onNext, onDo
         boxShadow: "0 12px 40px rgba(0,0,0,0.3)", zIndex: 9999,
         animation: "fadeSlideUp 0.3s ease both"
       }}>
-        {!mandatory && (
-          <button onClick={onClose} style={{
-            position: "absolute", top: -12, right: -12,
-            background: "#0F172A", border: "none", width: 32, height: 32,
+        {/* Close / Skip button */}
+        <button
+          onClick={onClose}
+          aria-label="Skip Tour"
+          title="Skip Tour"
+          style={{
+            position: "absolute", top: -10, right: -10,
+            background: "#0F172A", border: "none", width: 28, height: 28,
             borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center",
             cursor: "pointer", boxShadow: "0 4px 12px rgba(0,0,0,0.2)"
-          }}>
-            <span className="material-symbols-outlined" style={{ color: "#fff", fontSize: 18 }}>close</span>
-          </button>
-        )}
+          }}
+        >
+          <span className="material-symbols-outlined" style={{ color: "#fff", fontSize: 16 }}>close</span>
+        </button>
 
-        <p style={{ fontSize: 12, fontWeight: 700, color: "#64748B", textTransform: "uppercase", letterSpacing: "0.05em", margin: "0 0 8px" }}>
-          Step {pageIndex + 1} of {totalPages}
-        </p>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", margin: "0 0 8px" }}>
+          <p style={{ fontSize: 12, fontWeight: 700, color: "#64748B", textTransform: "uppercase", letterSpacing: "0.05em", margin: 0 }}>
+            Step {pageIndex + 1} of {totalPages}
+          </p>
+          <button
+            onClick={onDone}
+            style={{
+              background: "transparent", border: "none", color: "#64748B",
+              fontSize: 12, fontWeight: 600, cursor: "pointer", padding: "2px 6px",
+              textDecoration: "underline"
+            }}
+          >
+            Skip all
+          </button>
+        </div>
         <h3 style={{ fontSize: 18, fontWeight: 800, color: "#0F172A", margin: "0 0 8px" }}>{elem.title}</h3>
         <p style={{ fontSize: 14, color: "#475569", margin: "0 0 20px", lineHeight: 1.5 }}>{elem.description}</p>
 
-        {isLastElemOnPage && isLastPage ? (
-          <button onClick={onDone} style={{
-            width: "100%", padding: "12px", borderRadius: 12, background: "#2bee6c", border: "none",
-            fontSize: 15, fontWeight: 700, color: "#003918", cursor: "pointer"
-          }}>Done</button>
-        ) : (
-          <button onClick={onNext} style={{
-            width: "100%", padding: "12px", borderRadius: 12, background: "#0F172A", border: "none",
-            fontSize: 15, fontWeight: 700, color: "#fff", cursor: "pointer"
-          }}>Next</button>
-        )}
+        <div style={{ display: "flex", gap: 10 }}>
+          {isLastElemOnPage && isLastPage ? (
+            <button onClick={onDone} style={{
+              flex: 1, padding: "12px", borderRadius: 14, background: "var(--color-brand-primary, #13ecc8)", border: "none",
+              fontSize: 15, fontWeight: 700, color: "#003918", cursor: "pointer",
+              boxShadow: "0 4px 12px rgba(19, 236, 200, 0.3)"
+            }}>Get Started</button>
+          ) : (
+            <button onClick={onNext} style={{
+              flex: 1, padding: "12px", borderRadius: 14, background: "#0F172A", border: "none",
+              fontSize: 15, fontWeight: 700, color: "#fff", cursor: "pointer"
+            }}>Next</button>
+          )}
+        </div>
       </div>
     </>
   );
