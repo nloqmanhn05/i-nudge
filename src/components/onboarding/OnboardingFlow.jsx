@@ -58,7 +58,7 @@ function OnboardStep2({ onBack, onDone }) {
             />
           </div>
           <p style={{ marginTop: 12, fontSize: 14, color: "#94A3B8", textAlign: "center", lineHeight: 1.6 }}>
-            This is how Nudge will address you in notifications.
+            This is how i-nudge will address you in notifications.
           </p>
         </div>
       </div>
@@ -78,7 +78,7 @@ function OnboardStep2({ onBack, onDone }) {
             transition: "all 0.3s",
           }}
         >
-          <span>{activated ? "Welcome!" : "Activate Nudge!"}</span>
+          <span>{activated ? "Welcome!" : "Activate i-nudge!"}</span>
           <span className="material-symbols-outlined" style={{ fontSize: 22, fontVariationSettings: "'FILL' 1" }}>
             {activated ? "check_circle" : "auto_awesome"}
           </span>
