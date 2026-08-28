@@ -28,19 +28,6 @@ Millions of users in Southeast Asia juggle multiple BNPL platforms — Grab PayL
 - 💱 Supports 10 ASEAN currencies (MYR, SGD, IDR, THB, PHP, VND & more)
 - 🎯 Promotes savings-first behaviour through a Wishlist feature
 
----
-
-## 🔗 Submission Links
-
-| Item | Link |
-|------|------|
-| 🎨 Stitch Design File | (https://stitch.withgoogle.com/projects/5477638289673752750) |
-| 🖥️ Prototype (Interactive) | (https://ai.studio/apps/9ed170c6-0ab2-42ed-b273-f8b54688e321) |
-| 🎬 Video Demo (YouTube ) | https://youtu.be/XUyRveJxJFA |
-| 📄 Project Report (PDF) | https://drive.google.com/file/d/1gPIu1DQt1jiFuogTV1O7co0C50Opsi9v/view |
-| 💻 GitHub Repository | https://github.com/nloqmanhn05/Nudge |
-
----
 
 ## 🛠️ Tech Stack
 
